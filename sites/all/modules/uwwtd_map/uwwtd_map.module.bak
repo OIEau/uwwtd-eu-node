@@ -1,0 +1,299 @@
+<?php
+//include_once(drupal_get_path('module', 'uwwtd_map') . '/inc/uwwtd_map.inc');
+
+// Fonction pour definir le lien de menu
+function uwwtd_map_menu(){
+	$items = array();
+	$items['map/europe-list'] = array(
+		'title' => t('Europe Map'),
+		'description' => t('Europe Map'),
+		'page callback' => 'uwwtd_maps_page',
+		'page arguments' => array(),
+		'access callback' => TRUE,
+	);
+    $items['map/europe/%'] = array(
+		'title' => t('Europe Map'),
+		'description' => t('Europe Map'),
+		'page callback' => 'uwwtd_map_display_map',
+		'page arguments' => array(2),
+		'access callback' => TRUE,
+	);
+    
+  	$items['map/europe/%/generate'] = array(
+  		'title' => t('Europe Map'),
+  		'description' => t('Europe Map'),
+  		'page callback' => 'uwwtd_map_display_map_generate',
+  		'page arguments' => array(2),
+  		'access arguments' => array('Data-management access'),
+  	);
+
+    return $items;
+}
+
+
+function uwwtd_maps_page() {
+    $list = [];
+    
+    foreach($GLOBALS['uwwtd_map']['maps'] as $id=>$map){
+        if(!isset($list[$map['map_type']])){
+            $list[$map['map_type']]=['children'=>[], 'data'=>$map['map_type']];
+        }
+        $list[$map['map_type']]['children'][] = l($map['title'], 'map/europe/'.$id) .' ['.l('png', 'map/europe/'.$id.'/generate').']';
+    } 
+    
+    return theme('item_list', ['items'=>$list, 'title'=>"List of available maps"]);
+}
+
+function uwwtd_map_display_map($wms_layer_name) {
+
+  drupal_add_css(drupal_get_path('module', 'uwwtd_map') . '/css/uwwtd_map.css');
+   
+   if(isset($GLOBALS['uwwtd_map']['maps'][$wms_layer_name])){
+       $map_info = $GLOBALS['uwwtd_map']['maps'][$wms_layer_name];
+        return uwwtd_map_render($wms_layer_name, $map_info['map_type'], $map_info['title']);
+   }
+   else {
+       return "This map id is not valid ".$wms_layer_name;
+   }
+  
+
+}
+
+function uwwtd_map_render($wms_layer_name, $map_type, $title){
+   
+    libraries_load('proj4js');
+    openlayers_add_js_projection_definition(
+      openlayers_get_projection_by_identifier('EPSG:3857')
+    );
+   
+  $preset = openlayers_preset_load($GLOBALS['uwwtd_map']['europe']['main_map']);
+  $main_map =  uwwtd_map_openlayers_build_map($preset->data, $wms_layer_name);
+  $main_output =theme('openlayers_map', array(
+      'map' => $main_map,
+      'map_name' => $GLOBALS['uwwtd_map']['europe']['main_map']
+    ));
+    $js = array('openlayers' => array('maps' => array($main_map['id'] => $main_map)));
+  $group = '';
+  foreach ($GLOBALS['uwwtd_map']['europe']['list_minimap'] as $key => $list_map) {
+    $group .= '<div class="'.$key.'">';
+    $group .= '<div class="'.$key.'-inner">';
+    foreach ($list_map as $map_config) {
+        $preset = openlayers_preset_load($map_config['map_name']);
+        if($map_config['map_name'] =='malta'){
+            $preset->data['center']['initial']['centerpoint'] = '14.37, 35.95';
+        }
+        elseif($map_config['map_name'] =='reunion'){
+            $preset->data['center']['initial']['centerpoint'] = '55.54687498286358, -21.13';
+        }
+        elseif($map_config['map_name'] =='martinique'){
+            $preset->data['center']['initial']['centerpoint'] = '-60.920312496292004, 14.604847159448763';
+        }
+        elseif($map_config['map_name'] =='acore'){
+            $preset->data['center']['initial']['centerpoint'] = '-27.141875002274543, 38.27268853578907'; 
+        }
+        elseif($map_config['map_name'] =='canariass'){
+            $preset->data['center']['initial']['centerpoint'] = '-15.820312504352689, 28.4043806846327';
+        }
+        
+      $mini_map = uwwtd_map_openlayers_build_map($preset->data, $wms_layer_name);
+      $js['openlayers']['maps'][$mini_map['id']]= $mini_map;
+      $group .=  '
+      <div class="mini-map '.$mini_map->name.' '.$map_config['class'].'">
+         <div class="minimap-title">'.$map_config['title'].'</div>
+      '
+       . theme('openlayers_map', array(
+      'map' => $mini_map,
+      'map_name' => $map_config['map_name']
+    )). '</div>';
+    }
+    $group .= '</div>';
+    $group .= '</div>';
+  }
+  
+  drupal_add_js($js, 'setting');
+  
+  //==================TODO legend
+   return theme(
+        'europe_map', 
+        array(
+            'param' => array( 
+                'main_output' => $main_output,
+                'group' => $group,
+                'title'=>$title,
+                'legend'=>uwwtd_map_getLegend($map_type)
+            )
+        )
+    ); 
+}
+
+function uwwtd_map_getLegend($map_type){
+    $output = '';
+    if(isset($GLOBALS['uwwtd_map']['legend'][$map_type])){
+        $legend = $GLOBALS['uwwtd_map']['legend'][$map_type];
+        foreach($legend as $col){
+            $col_str ='';
+            if($col['title']!=''){$col_str.='<h3>'.$col['title'].'</h3>';}
+            foreach($col['items'] as $item){
+                $col_str.='<div class="legend-item"><div class="legend-item-color" style="background-color:'.$item['color'].';"></div><div class="legend-item-label">'.$item['label'].'</div></div>';
+            }
+            $output.= '<div class="legend-cols">'.$col_str.'</div>';
+        }
+    }
+    return '<div class="legend-container">'.$output.'</div>';
+}
+
+function uwwtd_map_display_map_generate($wms_layer_name) {
+//   return 'ok';
+  $uri = 'public://map/'.$wms_layer_name.'.png'; 
+  $url_source = url('map/europe/'.$wms_layer_name, ['absolute'=>true]);
+
+  $target_file = escapeshellarg(drupal_realpath($uri));
+          
+//   $command = "/opt/wkhtmltox.0.12.4/bin/wkhtmltoimage --crop-y 10 --crop-w 700 --crop-h 1170 --javascript-delay 5000  '" . $url_source  . "' " . $target_file;
+  $command = str_replace(array('[#SOURCE#]','[#TARGET#]'), array($url_source, $target_file), $GLOBALS['uwwtd_map']['europe']['wkhtmlpath_command']);
+
+  $result = system($command, $return_var);  
+// dsm($return_var); 
+// dsm($result);  
+
+  $markup = '<img src="'.file_create_url($uri). '?d=' . date("YmdHis") . '" />';
+
+  return [
+    '#type' => 'markup',
+    '#markup' => $markup,
+  ];
+}
+
+/**
+ *
+ */
+function uwwtd_map_theme($existing, $type, $theme, $path) {
+  return array(
+    'europe_map' => array(
+      'variables' => array(
+        'param' => null,
+      ),
+      'path' => drupal_get_path('module', 'uwwtd_map') . '/template/',
+      'template' => 'europe-map',
+    ),
+  );         
+}
+
+function uwwtd_map_openlayers_build_map($map = array(), $wms_layer_name) {
+    
+  // Get the necessary parts
+  openlayers_include();
+  module_load_include('inc', 'openlayers', 'includes/openlayers.render');
+
+  // If no map is specified, use the default map.
+  if (empty($map)) {
+    if ($loaded_map = openlayers_map_load(
+      variable_get('openlayers_default_map', 'default'))) {
+      $map = $loaded_map->data;
+    }
+  }
+
+  // Create ID for map as this will help with alters.
+  $map['id'] = !isset($map['id']) ?
+    _openlayers_create_map_id() : $map['id'];
+
+  // Hook to alter map before main processing.  Styles, behaviors,
+  // layers may all be added here.
+  // hook_openlayers_map_preprocess_alter($map)
+  drupal_alter('openlayers_map_preprocess', $map);
+
+  // Styles and layer styles are not required parameters
+  $map['styles'] = isset($map['styles']) ? $map['styles'] : array();
+  $map['layer_styles'] = isset($map['layer_styles']) ? $map['layer_styles'] : array();
+  $map['layer_styles_select'] = isset($map['layer_styles_select']) ? $map['layer_styles_select'] : array();
+  $map['layer_styles_temporary'] = isset($map['layer_styles_temporary']) ? $map['layer_styles_temporary'] : array();
+
+  // Process map parts.
+  $map['layers'] = _uwwtd_map_openlayers_layers_process($map['layers'], $map, $wms_layer_name);
+  $map['behaviors'] = _openlayers_behaviors_render($map['behaviors'], $map);
+  $map['styles'] = _openlayers_styles_process($map['styles'], $map['layer_styles'], $map['layer_styles_select'], $map['layer_styles_temporary'], $map);
+
+  // Restrict map to its projection extent (data outwith cannot be represented).
+  // Layer can additionally specfiy their maxExtent in case they use
+  // non-default grids.
+  $projection = openlayers_get_projection_by_identifier($map['projection']);
+  $map['maxExtent'] = $projection->getProjectedExtent();
+
+  // In case the layer offers the same projection as the map, use this and do not provide
+  // projection definition to client. Otherwise rely on the client to reproject on the fly.
+  foreach ($map['layers'] as $layer_name => $layer) {
+    if(in_array($map['projection'], $layer['projection'])){
+      $map['layers'][$layer_name]['projection'] = $map['projection'];
+    } else {
+      // Client is able to reproject any possible projection because their definitions need to be
+      // known to be able to set up a layer with a certain projection. Thus choice does not matter.
+      $layerProjectionIdentifier = reset($layer['projection']);
+      if($layerProjectionIdentifier===FALSE){
+        throw new Exception(
+          t('Layer !title lacks its projection. Please edit it to select a projection.', array(
+            '!title' => $layer['title']
+          ))
+        );
+      }
+      $map['layers'][$layer_name]['projection'] = $layerProjectionIdentifier;
+    }
+
+    // Ensure JavaScript gets proper type.
+    $map['layers'][$layer_name]['isBaseLayer'] = (boolean)($layer['isBaseLayer']);
+  }
+
+  // Hook to alter map one last time.  Final modification to existing
+  // styles, behaviors, layers can happen here, but adding new styles,
+  // behaviors will not get rendered.
+  // hook_openlayers_map_alter($map)
+  drupal_alter('openlayers_map', $map);
+
+  // Check map for errors
+  $map['errors'] = openlayers_error_check_map($map);
+  return $map;
+}
+
+
+/**
+ * Initialize the layer array into an indexed array of layer objects
+ *
+ * @param $layers
+ *   Array of layers to process
+ * @param $map
+ *   Map array
+ * @return $layer_data
+ *   Array of initialized layer objects
+ */
+function _uwwtd_map_openlayers_layers_process($layers = array(), &$map = array(), $wms_layer_name) {
+  $layer_data = array();
+
+  // Load Layers and assign weights
+  foreach ($layers as $key => $layer) {
+    if ($layer_object = openlayers_layer_load($layer)) {
+      if($key == 'uwwtd_eu_generic') {
+        $layer_object->data['options']['layers'][0] = $wms_layer_name;
+      }
+      $layers[$key] = $layer_object;
+      if (!empty($map['layer_weight'][$key])) {
+        $layers[$key]->weight = $map['layer_weight'][$key];
+      }
+      else $layers[$key]->weight = 0;
+    }
+    else unset($layers[$key]);
+  }
+
+  // Sort layers
+  usort($layers, '_openlayers_layers_process_sort');
+
+  // Process into array-based layer data for the map
+  foreach ($layers as $type => $layer_object) {
+    if (is_object($layer_object)) {
+      $layer_object->render($map);
+      $layer_object->data['title'] = $layer_object->title;
+      $layer_object->data['weight'] = $layer_object->weight;
+      $layer_data[$layer_object->name] = $layer_object->data;
+    }
+  }
+
+  return $layer_data;
+}

@@ -1,0 +1,2644 @@
+<?php
+require_once(drupal_get_path('module', 'uwwtd') . '/inc/uwwtd.config.inc');
+require_once(drupal_get_path('module', 'uwwtd') . '/inc/utils.inc');
+
+//refaire menu listerror
+//dans bulk datadeletion, supprimer error
+//get all label from database ?   $field = field_info_field('field_uwwtd_err_category');
+//get all color from database ?   $field = field_info_field('field_uwwtd_err_category');
+
+function uwwtd_menu(){
+	$items = array();
+	$items['admin/config/uwwtd/create_config_file_display'] = array(
+		'title' => t('Create config file display'),
+		'description' => t('Create config file display'),
+		'page callback' => 'uwwtd_create_config_file_display',
+		'page arguments' => array(),
+		//'access callback' => TRUE,
+		'access arguments' => array('Data-management access'),
+		);
+	$items['data'] = array(
+		'title' => t('Data management center'),
+		'description' => t('A center to manage all the site data'),
+		'page callback' => 'drupal_get_form',
+		'page arguments' => array('uwwtd_data_form'),
+		//'access callback' => TRUE,
+		'access arguments' => array('Data-management access'),
+		'file' => 'data_center.inc',
+		'file path' => drupal_get_path('module', 'uwwtd') . '/inc/',
+		);
+	$items['data/import'] = array(
+		'title' => t('Data import'),
+		'description' => t('Form to upload new data'),
+		'page callback' => 'drupal_get_form',
+		'page arguments' => array('uwwtd_import_form'),
+		//'access callback' => TRUE,
+		'access arguments' => array('Data-management access'),
+		'file' => 'data_center.inc',
+		'file path' => drupal_get_path('module', 'uwwtd') . '/inc/',
+		);
+	$items['data/shapes'] = array(
+		'title' => t('Receiving areas\' shapes upload'),
+		'description' => t('Form to upload the receiving areas\' shapes'),
+		'page callback' => 'drupal_get_form',
+		'page arguments' => array('uwwtd_shapes_form'),
+		//'access callback' => TRUE,
+		'access arguments' => array('Data-management access'),
+		'file' => 'data_center.inc',
+		'file path' => drupal_get_path('module', 'uwwtd') . '/inc/',
+		);
+	$items['data/check'] = array(
+		'title' => t('Data checking process'),
+		'description' => t('Process to check all the entered data for a given year'),
+		'page callback' => 'drupal_get_form',
+		'page arguments' => array('uwwtd_check_form'),
+		//'access callback' => TRUE,
+		'access arguments' => array('Data-management access'),
+		'file' => 'data_center.inc',
+		'file path' => drupal_get_path('module', 'uwwtd') . '/inc/',
+		);
+	$items['data/conformity'] = array(
+		'title' => t('Data conformity'),
+		'description' => t('Data conformity page'),
+		'page callback' => 'drupal_get_form',
+		'page arguments' => array('uwwtd_conformity_form'),
+		//'access callback' => TRUE,
+		'access arguments' => array('Data-management access'),
+		'file' => 'data_center.inc',
+		'file path' => drupal_get_path('module', 'uwwtd') . '/inc/',
+		);
+
+    $items['data/error-list-stats'] = array(
+		'title' => t('Errors summary statistics'),
+		'description' => t('List of errors aggregated by type'),
+		'page callback' => 'uwwtd_get_errors_stats',
+		//'page arguments' => array('uwwtd_conformity_form'),
+		//'access callback' => TRUE,
+		'access arguments' => array('Data-management access'),
+		'file' => 'data_center.inc',
+		'file path' => drupal_get_path('module', 'uwwtd') . '/inc/',
+		);
+
+	$items['register']=array(
+		'title' => t('Register'),
+		'page callback' => 'drupal_get_form',
+		'page arguments' => array('uwwtd_register_form'),
+		//'access callback' => TRUE,
+		'access arguments' => array('Data-management access'),
+		'file' => 'inc/register.inc',
+		'file path' => drupal_get_path('module', 'uwwtd')
+	);
+
+  $items['article17/%']=array(
+    'title' => t('Article 17 export'),
+    'page callback' => 'uwwtd_article17_export',
+    'page arguments' => array(1),
+    'access callback' => TRUE,
+    //'access arguments' => array('Data-management access'),
+    'file' => 'inc/article17.inc',
+    'file path' => drupal_get_path('module', 'uwwtd')
+  );
+
+	$items['id/%/%'] = array(
+        'page callback' => 'uwwtd_node_redirect',
+        'page arguments' => array(1,2),
+        'access arguments' => true,
+        'access callback' => TRUE,
+        'type' => MENU_CALLBACK,
+    );
+  $items['id/%/%/view'] = array(
+    'title' => 'View',
+    'type' => MENU_DEFAULT_LOCAL_TASK,
+    'weight' => -10,
+  );
+  $items['id/%/%/edit'] = array(
+    'title' => 'Edit',
+    'page callback' => 'uwwtd_node_redirect',
+    'page arguments' => array(1,2,3),
+    'access callback' => 'node_access',
+    'access arguments' => array('update', 1),
+    'weight' => 0,
+    'type' => MENU_LOCAL_TASK,
+    'context' => MENU_CONTEXT_PAGE | MENU_CONTEXT_INLINE,
+  );
+
+  //redirection treatment-plant
+  $items['treatment-plant/%'] = array(
+    'page callback' => 'uwwtd_node_redirection',
+    'page arguments' => array(1),
+    'access callback' => true,
+    'access arguments' => true,
+    'type' => MENU_CALLBACK,
+  );
+  $items['treatment-plant/%/history'] = array(
+    'page callback' => 'uwwtd_uwwtp_history_page',
+    'page arguments' => array(1),
+    'access callback' => true,
+    'access arguments' => true,
+    'type' => MENU_CALLBACK,
+    'file' => 'uwwtd.graphs.inc',
+ 	'file path' => drupal_get_path('module', 'uwwtd')
+  );
+  //redirection agglomeration
+  $items['agglomeration/%'] = array(
+    'page callback' => 'uwwtd_node_redirection',
+    'page arguments' => array(1),
+    'access callback' => true,
+    'access arguments' => true,
+    'type' => MENU_CALLBACK,
+  );
+  $items['agglomeration/%/history'] = array(
+    'page callback' => 'uwwtd_agg_history_page',
+    'page arguments' => array(1),
+    'access callback' => true,
+    'access arguments' => true,
+    'type' => MENU_CALLBACK,
+    'file' => 'uwwtd.graphs.inc',
+ 	'file path' => drupal_get_path('module', 'uwwtd')
+  );
+  
+  //redirection receiving-area
+  $items['receiving-area/%'] = array(
+    'page callback' => 'uwwtd_node_redirection',
+    'page arguments' => array(1),
+    'access callback' => true,
+    'access arguments' => true,
+    'type' => MENU_CALLBACK,
+  );
+  //redirection discharge-point
+  $items['discharge-point/%'] = array(
+    'page callback' => 'uwwtd_node_redirection',
+    'page arguments' => array(1),
+    'access callback' => true,
+    'access arguments' => true,
+    'type' => MENU_CALLBACK,
+  );
+  ///////////////////////////////////////////////////////////////////
+  $items['agglomerations/compliance'] = array(
+    'page callback' => 'uwwtd_page_agglomeration_compliance',
+    'page arguments' => array(),
+    'access callback' => true,
+    'access arguments' => true,
+    'type' => MENU_CALLBACK,
+    'file' => 'pages.inc',
+ 	'file path' => drupal_get_path('module', 'uwwtd') . '/inc/'
+  );
+  $items['agglomerations/compliance/csv'] = array(
+    'page callback' => 'uwwtd_page_agglomeration_compliance',
+    'page arguments' => array('csv'),
+    'access callback' => true,
+    'access arguments' => true,
+    'type' => MENU_CALLBACK,
+    'file' => 'pages.inc',
+ 	'file path' => drupal_get_path('module', 'uwwtd') . '/inc/'
+  );
+  $items['agglomerations/compliance/xls'] = array(
+    'page callback' => 'uwwtd_page_agglomeration_compliance',
+    'page arguments' => array('xls'),
+    'access callback' => true,
+    'access arguments' => true,
+    'type' => MENU_CALLBACK,
+    'file' => 'pages.inc',
+ 	'file path' => drupal_get_path('module', 'uwwtd') . '/inc/'
+  );
+  $items['agglomerations/connection'] = array(
+    'page callback' => 'uwwtd_page_agglomeration_connection',
+    'page arguments' => array(),
+    'access callback' => true,
+    'access arguments' => true,
+    'type' => MENU_CALLBACK,
+    'file' => 'pages.inc',
+ 	'file path' => drupal_get_path('module', 'uwwtd') . '/inc/'
+  );
+  $items['agglomerations/connection/csv'] = array(
+    'page callback' => 'uwwtd_page_agglomeration_connection',
+    'page arguments' => array('csv'),
+    'access callback' => true,
+    'access arguments' => true,
+    'type' => MENU_CALLBACK,
+    'file' => 'pages.inc',
+ 	'file path' => drupal_get_path('module', 'uwwtd') . '/inc/'
+  );
+  $items['agglomerations/connection/xls'] = array(
+    'page callback' => 'uwwtd_page_agglomeration_connection',
+    'page arguments' => array('xls'),
+    'access callback' => true,
+    'access arguments' => true,
+    'type' => MENU_CALLBACK,
+    'file' => 'pages.inc',
+ 	'file path' => drupal_get_path('module', 'uwwtd') . '/inc/'
+  );
+  $items['uwwtps/compliance'] = array(
+    'page callback' => 'uwwtd_page_uwwtps_compliance',
+    'page arguments' => array(),
+    'access callback' => true,
+    'access arguments' => true,
+    'type' => MENU_CALLBACK,
+    'file' => 'pages.inc',
+ 	'file path' => drupal_get_path('module', 'uwwtd') . '/inc/'
+  );
+  $items['uwwtps/compliance/csv'] = array(
+    'page callback' => 'uwwtd_page_uwwtps_compliance',
+    'page arguments' => array('csv'),
+    'access callback' => true,
+    'access arguments' => true,
+    'type' => MENU_CALLBACK,
+    'file' => 'pages.inc',
+ 	'file path' => drupal_get_path('module', 'uwwtd') . '/inc/'
+  );
+  $items['uwwtps/compliance/xls'] = array(
+    'page callback' => 'uwwtd_page_uwwtps_compliance',
+    'page arguments' => array('xls'),
+    'access callback' => true,
+    'access arguments' => true,
+    'type' => MENU_CALLBACK,
+    'file' => 'pages.inc',
+ 	'file path' => drupal_get_path('module', 'uwwtd') . '/inc/'
+  );
+  $items['uwwtps/treatment'] = array(
+    'page callback' => 'uwwtd_page_uwwtps_treatment',
+    'page arguments' => array(),
+    'access callback' => true,
+    'access arguments' => true,
+    'type' => MENU_CALLBACK,
+    'file' => 'pages.inc',
+ 	'file path' => drupal_get_path('module', 'uwwtd') . '/inc/'
+  );
+  $items['uwwtps/treatment/csv'] = array(
+    'page callback' => 'uwwtd_page_uwwtps_treatment',
+    'page arguments' => array('csv'),
+    'access callback' => true,
+    'access arguments' => true,
+    'type' => MENU_CALLBACK,
+    'file' => 'pages.inc',
+ 	'file path' => drupal_get_path('module', 'uwwtd') . '/inc/'
+  );
+  $items['uwwtps/treatment/xls'] = array(
+    'page callback' => 'uwwtd_page_uwwtps_treatment',
+    'page arguments' => array('xls'),
+    'access callback' => true,
+    'access arguments' => true,
+    'type' => MENU_CALLBACK,
+    'file' => 'pages.inc',
+ 	'file path' => drupal_get_path('module', 'uwwtd') . '/inc/'
+  );
+  $items['uwwtps/pressure'] = array(
+    'page callback' => 'uwwtd_page_uwwtps_pressure',
+    'page arguments' => array(),
+    'access callback' => true,
+    'access arguments' => true,
+    'type' => MENU_CALLBACK,
+    'file' => 'pages.inc',
+ 	'file path' => drupal_get_path('module', 'uwwtd') . '/inc/'
+  );
+  $items['uwwtps/pressure/csv'] = array(
+    'page callback' => 'uwwtd_page_uwwtps_pressure',
+    'page arguments' => array('csv'),
+    'access callback' => true,
+    'access arguments' => true,
+    'type' => MENU_CALLBACK,
+    'file' => 'pages.inc',
+ 	'file path' => drupal_get_path('module', 'uwwtd') . '/inc/'
+  );
+  $items['uwwtps/pressure/xls'] = array(
+    'page callback' => 'uwwtd_page_uwwtps_pressure',
+    'page arguments' => array('xls'),
+    'access callback' => true,
+    'access arguments' => true,
+    'type' => MENU_CALLBACK,
+    'file' => 'pages.inc',
+ 	'file path' => drupal_get_path('module', 'uwwtd') . '/inc/'
+  );
+
+  $items['sensitive-areas'] = array(
+    'title' => 'Sensitive areas',
+    'page callback' => 'uwwtd_sensitive_areas_page',
+    'access callback' => true,
+    'type' => MENU_CALLBACK,
+    'file' => 'pages.inc',
+ 	'file path' => drupal_get_path('module', 'uwwtd') . '/inc/'
+  );
+  $items['sensitive_areas/csv'] = array(
+    'page callback' => 'uwwtd_sensitive_areas_page',
+    'page arguments' => array('csv'),
+    'access callback' => true,
+    'access arguments' => true,
+    'type' => MENU_CALLBACK,
+    'file' => 'pages.inc',
+ 	'file path' => drupal_get_path('module', 'uwwtd') . '/inc/'
+  );
+  $items['sensitive_areas/xls'] = array(
+    'page callback' => 'uwwtd_sensitive_areas_page',
+    'page arguments' => array('xls'),
+    'access callback' => true,
+    'access arguments' => true,
+    'type' => MENU_CALLBACK,
+    'file' => 'pages.inc',
+ 	'file path' => drupal_get_path('module', 'uwwtd') . '/inc/'
+  );
+
+  $items['discharge-points'] = array(
+    'title' => 'Discharge points',
+    'page callback' => 'uwwtd_dcp_page',
+    'access callback' => true,
+    'type' => MENU_CALLBACK,
+    'file' => 'pages.inc',
+ 	'file path' => drupal_get_path('module', 'uwwtd') . '/inc/'
+  );
+  $items['discharge-points/csv'] = array(
+    'page callback' => 'uwwtd_dcp_page',
+    'page arguments' => array('csv'),
+    'access callback' => true,
+    'access arguments' => true,
+    'type' => MENU_CALLBACK,
+    'file' => 'pages.inc',
+ 	'file path' => drupal_get_path('module', 'uwwtd') . '/inc/'
+  );
+  $items['discharge-points/xls'] = array(
+    'page callback' => 'uwwtd_dcp_page',
+    'page arguments' => array('xls'),
+    'access callback' => true,
+    'access arguments' => true,
+    'type' => MENU_CALLBACK,
+    'file' => 'pages.inc',
+ 	'file path' => drupal_get_path('module', 'uwwtd') . '/inc/'
+  );
+
+    $items['discharge-points/reuse'] = array(
+    'title' => 'Discharge points',
+    'page callback' => 'uwwtd_dcp_reuse_page',
+    'access callback' => true,
+    'type' => MENU_CALLBACK,
+    'file' => 'pages.inc',
+ 	'file path' => drupal_get_path('module', 'uwwtd') . '/inc/'
+  );
+  $items['discharge-points/reuse/csv'] = array(
+    'page callback' => 'uwwtd_dcp_reuse_page',
+    'page arguments' => array('csv'),
+    'access callback' => true,
+    'access arguments' => true,
+    'type' => MENU_CALLBACK,
+    'file' => 'pages.inc',
+ 	'file path' => drupal_get_path('module', 'uwwtd') . '/inc/'
+  );
+  $items['discharge-points/reuse/xls'] = array(
+    'page callback' => 'uwwtd_dcp_reuse_page',
+    'page arguments' => array('xls'),
+    'access callback' => true,
+    'access arguments' => true,
+    'type' => MENU_CALLBACK,
+    'file' => 'pages.inc',
+ 	'file path' => drupal_get_path('module', 'uwwtd') . '/inc/'
+  );
+  
+  $items['download'] = array(
+    'page callback' => 'uwwtd_page_download',
+    'page arguments' => array(),
+    'access callback' => true,
+    'access arguments' => true,
+    'type' => MENU_CALLBACK,
+  );
+  ///////////////////////////////////////////////////////////////////
+//     $items['report/pdf'] = array(
+// 		'title' => t('PDF report'),
+// 		'description' => t('Data conformity page'),
+// 		'page callback' => 'uwwtd_make_pdf_report',
+// 		//'page arguments' => array('uwwtd_conformity_form'),
+// 		'access callback' => TRUE,
+// 		//'access arguments' => array('Data-management access'),
+// 		'file' => 'pdf.inc',
+// 		'file path' => drupal_get_path('module', 'uwwtd')
+// 	);
+  $items['debug-export-xml/nid/%/aggcode/%'] = array(
+    'page callback' => 'debug_export_xml',
+    'page arguments' => array(2,3,4),
+//     'access callback' => true,
+    'access arguments' => array('Data-management access'),
+    'type' => MENU_CALLBACK,
+// 	'file' => 'utils.inc',
+// 	'file path' => drupal_get_path('module', 'uwwtd') . '/inc/'
+  );
+    $items['uwwtd-debug']=array(
+    	'title' => t('Debug'),
+    	'page callback' => 'uwwtd_debug',
+    	//'page arguments' => array('uwwtd_debug_form'),
+    	//'access callback' => TRUE,
+    	'access arguments' => array('Data-management access'),
+     	'file' => 'utils.inc',
+     	'file path' => drupal_get_path('module', 'uwwtd') . '/inc',
+    );
+  $items['stats/querys'] = array(
+  		'page callback' => 'uwwtd_page_stats_querys',
+  		'page arguments' => array(),
+  		'access callback' => true,
+  		'access arguments' => true,
+  		'type' => MENU_CALLBACK,
+  		'file' => 'uwwtd.stats.inc',
+  		'file path' => drupal_get_path('module', 'uwwtd')
+  );
+  $items['stats/graphs'] = array(
+  		'page callback' => 'uwwtd_stats_graphs_page',
+  		'page arguments' => array(),
+  		'access callback' => true,
+  		'access arguments' => true,
+  		'type' => MENU_CALLBACK,
+  		'file' => 'uwwtd.graphs.inc',
+  		'file path' => drupal_get_path('module', 'uwwtd')
+  );
+	//MENUS FOR CONFIGURATION
+
+  	$items['admin/config/uwwtd'] = array(
+    'title' => 'General settings',
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('uwwtd_general_config'),
+    'access arguments' => array('Data-management access'),
+    'type' => MENU_LOCAL_TASK,
+    'file' => 'inc/uwwtd.admin.config.inc'
+    );
+
+    $items['admin/config/uwwtd/extlinks'] = array(
+    'title' => 'Set external links',
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('construct_extlinks_form'),
+    'access arguments' => array('Data-management access'),
+    'type' => MENU_LOCAL_TASK,
+    'file' => 'uwwtd.forms.inc'
+    );
+
+    $items['admin/config/uwwtd/general'] = array(
+    'title' => 'General settings',
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('uwwtd_general_config'),
+    'access arguments' => array('Data-management access'),
+    'type' => MENU_LOCAL_TASK,
+    'file' => 'inc/uwwtd.admin.config.inc'
+    );
+
+	$items['admin/config/uwwtd/download'] = array(
+    'title' => 'Metadata links',
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('uwwtd_download_config'),
+    'access arguments' => array('Data-management access'),
+    'type' => MENU_LOCAL_TASK,
+    'file' => 'inc/uwwtd.admin.config.inc'
+    );
+
+  //rebuild slovenia deadline
+    $items['correction_slovenia_date'] = array(
+    'page callback' => 'uwwtd_correction_slovenia_date',
+//     'access callback' => true,
+    'access arguments' => array('Data-management access'),
+    'type' => MENU_CALLBACK,
+    'file' => 'correction.inc',
+    'file path' => drupal_get_path('module', 'uwwtd') . '/inc',
+    );
+    //Provide set compliance link on agglomeration page
+    $items['node/%node/compliance'] = array(
+		'title'=>t('Compliance'),
+		'page callback' => 'uwwtd_run_compliance_page',
+        'page arguments' => array(1),
+		'access callback'=>'uwwtd_check_node_compliance',
+        'access arguments' => array(1),
+		'type' => MENU_LOCAL_TASK,
+        'file' => 'data_center.inc',
+		'file path' => drupal_get_path('module', 'uwwtd').'/inc/',
+        'weight' => 102,
+    );
+
+  return $items;
+}
+
+//Define if user is allowed to view the "compliance" tab on agglomeration page
+function uwwtd_check_node_compliance($node){
+    global $user;
+    if(user_access('Data-management access', $user)){
+        if($node->type=='agglomeration'){
+           return true;
+        }
+        if($node->type=='uwwtp'){
+           return true;
+        }
+
+    }
+}
+
+
+function uwwtd_node_redirect($annee, $id, $action = null){
+	$query = db_select('field_data_field_siteid', 's');
+	$query->fields('s', array('entity_id', 'field_siteid_value'));
+	$query->condition('field_siteid_value', db_like($annee.'_'.$id), 'LIKE');
+
+	$result = $query->execute();
+	$node = false;
+	while($record = $result->fetchAssoc()) {
+		$node = node_load($record['entity_id']);
+	}
+
+	if($action == 'edit') {
+		drupal_goto('node/' . $node->nid . '/edit');
+	}
+
+	if($node == false){
+		drupal_set_message(t("The element you were searching for doesn't exist, sorry."), 'warning');
+		drupal_goto('<front>');
+	}
+	else{
+		drupal_set_title($node->title);
+		return render(node_view($node, 'full'));
+	}
+}
+
+function uwwtd_init(){
+    //$d3 = d3_get_libraries();
+    //dsm($d3);
+    //drupal_add_library('d3', 'd3.drupal');
+  ini_set('max_execution_time', '3600');
+
+}
+
+//test
+function uwwtd_node_redirection($id){
+	$page_url = "http://".$_SERVER['HTTP_HOST'].$_SERVER['REQUEST_URI'];
+	//echo "<pre>";print_r($_SERVER['REQUEST_URI']);echo "</pre>";
+	$type= explode("/",$page_url);
+	$type= $type[4];
+	//echo "<pre>";print_r($type);echo "</pre>";
+	if($type=='treatment-plant'){
+		$typeR='uww';
+		$id= strtolower($id);
+	}
+	if($type=='agglomeration'){
+		$typeR='agg';
+		$id= strtolower($id);
+	}
+	if($type=='receiving-area'){
+		$typeR='rca';
+		$id= strtolower($id);
+	}
+	if($type=='discharge-point'){
+		$typeR='dcp';
+		$id= strtolower($id);
+	}
+	//selectionne la dernière année
+// 	$query = "SELECT MAX(field_anneedata_value) FROM {field_data_field_anneedata}";
+// 	$result = db_query($query);
+// 	$annee = $result->fetchField();
+    $annee = uwwtd_get_max_annee();
+
+	$query = db_select('field_data_field_siteid', 's');
+	$query->fields('s', array('entity_id', 'field_siteid_value'));
+	$query->condition('field_siteid_value', db_like($annee.'_'.$typeR.'_'.$id), 'LIKE');
+	$result = $query->execute();
+	$record = $result->fetchAssoc();
+	$node = false;
+
+	if($record ==''){
+		$query = db_select('field_data_field_siteid', 's');
+		$query->fields('s', array('entity_id', 'field_siteid_value'));
+		$query->condition('field_siteid_value',  db_like($annee.'_'.$id), '=');
+		$result = $query->execute();
+		$record = $result->fetchAssoc();
+		$node=$record['entity_id'];
+	}else{
+		$node=$record['entity_id'];
+	}
+	if($node == false){
+		drupal_set_message(t("The element you were searching for doesn't exist, sorry."), 'warning');
+		drupal_goto('<front>');
+	}
+	else{
+            drupal_goto($GLOBALS['base_url'] . '/'.$type.'/'.$id.'/'.$annee);
+    		drupal_set_title($node->title);
+	}
+}
+
+// function uwwtd_debug_form($form, &$form_state){
+// 	// definition du champ input de type file
+// 	$form['uwwtd_file'] = array(
+// 		'#type' => 'managed_file',
+// 		'#title' => t('Data file'),
+// 		'#upload_validators' => array('file_validate_extensions' => array('shp')),
+// 		'#required' => TRUE,
+// 	);
+//
+// 	// Bouton envoyer
+// 	$form['submit_button'] = array(
+// 		'#type' => 'submit',
+// 		'#value' => t('Submit'),
+// 	);
+//
+// 	// Fonction a appeller quand on clique sur envoyer
+// 	$form['#submit'][] = 'uwwtd_debug_submit_handler';
+//     return $form;
+// }
+
+function uwwtd_views_pre_build(&$view){
+	//dsm($view);
+	if(
+		$view->name == 'waste_water_network' ||
+		$view->name == 'uwwtp_map' ||
+		$view->name == 'uwwtp_treatment' ||
+		$view->name == 'agglomeration' ||
+		$view->name == 'agglomeration_conformity' ||
+		$view->name == 'data_deletion'
+	){
+// 		$year = db_query(
+// 			"SELECT MAX(field_anneedata_value) FROM {field_data_field_anneedata}"
+// 		)->fetchField();
+        $year = uwwtd_get_max_annee();
+		if(!empty($year)) $view->filter['field_anneedata_value']->value = $year;
+	}
+
+//     if ($view->name == 'error_list') {
+//         dsm($view);
+//     }
+}
+
+function uwwtd_views_pre_render(&$view){
+// 	dsm($view);
+
+//todo use config 
+// $GLOBALS['uwwtd_errors_type']['category'] = array(
+//     'input' => 0,
+//     'linking' => 1,
+//     'geometry' => 2,
+//     'conformity' => 3,
+//     'format' => 4,
+// );
+// // 0|Notification
+// // 1|Warning
+// // 2|Error
+// //$GLOBALS['uwwtd_errors_type']['type']['error']
+// $GLOBALS['uwwtd_errors_type']['type'] = array(
+//     'notification' => 0,
+//     'warning' => 1,
+//     'error' => 2,
+// );
+
+    if ($view->name == 'error_list' && is_array($view->result)) {
+        $type_error = array_flip($GLOBALS['uwwtd_errors_type']['type']);
+        $category_error = array_flip($GLOBALS['uwwtd_errors_type']['category']);
+// dsm($type_error);
+// dsm($category_error);
+//         
+        foreach($view->result as $r => $result){
+            if(isset($view->result[$r]->uwwtd_import_errors_type)){
+//                 dsm($view->result[$r]);
+// dsm($view->result[$r]->uwwtd_import_errors_type);
+// dsm($type_error[$view->result[$r]->uwwtd_import_errors_type]);
+                if (isset($type_error[$view->result[$r]->uwwtd_import_errors_type])) {
+                    $view->result[$r]->uwwtd_import_errors_type = t($type_error[$view->result[$r]->uwwtd_import_errors_type]);
+                }
+                if (isset($category_error[$view->result[$r]->uwwtd_import_errors_category])) {
+                    $view->result[$r]->uwwtd_import_errors_category = t($category_error[$view->result[$r]->uwwtd_import_errors_category]);
+                }
+//                 break;
+            }
+        }
+    }
+
+	// if uwwtd treatment view
+	if($view->name == 'uwwtp_treatment' && $view->result !== TRUE){
+		foreach($view->result as $r => $result){
+			//dsm($result);
+		    //$view->result[$r]->field = 1;
+		    if(isset($view->result[$r]->field_field_uwwprimarytreatment[0]['raw']['value'])){
+		    	//dsm($view->result[$r]->field_field_uwwprimarytreatment[0]);
+		    	if($view->result[$r]->field_field_uwwprimarytreatment[0]['raw']['value'] === '1') $view->result[$r]->field_field_uwwprimarytreatment[0]['rendered']['#markup'] = t('Yes');
+		    	else $view->result[$r]->field_field_uwwprimarytreatment[0]['rendered']['#markup'] = t('No');
+		    }
+		    if(isset($view->result[$r]->field_field_uwwsecondarytreatment[0]['raw']['value'])){
+		    	if($view->result[$r]->field_field_uwwsecondarytreatment[0]['raw']['value'] === '1') $view->result[$r]->field_field_uwwsecondarytreatment[0]['rendered']['#markup'] = t('Yes');
+		    	else $view->result[$r]->field_field_uwwsecondarytreatment[0]['rendered']['#markup'] = t('No');
+		    }
+		    if(isset($view->result[$r]->field_field_uwwnremoval[0]['raw']['value'])){
+		    	if($view->result[$r]->field_field_uwwnremoval[0]['raw']['value'] === '1') $view->result[$r]->field_field_uwwnremoval[0]['rendered']['#markup'] = t('Yes');
+		    	else $view->result[$r]->field_field_uwwnremoval[0]['rendered']['#markup'] = t('No');
+		    }
+		    if(isset($view->result[$r]->field_field_uwwpremoval[0]['raw']['value'])){
+		    	if($view->result[$r]->field_field_uwwpremoval[0]['raw']['value'] === '1') $view->result[$r]->field_field_uwwpremoval[0]['rendered']['#markup'] = t('Yes');
+		    	else $view->result[$r]->field_field_uwwpremoval[0]['rendered']['#markup'] = t('No');
+		    }
+		}
+	}
+}
+
+function uwwtd_form_views_exposed_form_alter(&$form, &$form_state){
+		// for treatment plant booleans
+		if($form['#id'] == "views-exposed-form-uwwtp-treatment-page"){
+			$options = array(
+				'All' => t('- All -'),
+				'1' => t('Yes'),
+				'0' => t('No')
+			);
+
+			$form['field_uwwprimarytreatment_value'] = array(
+				'#type' => 'select',
+				'#options' => $options
+			);
+			$form['field_uwwsecondarytreatment_value'] = array(
+				'#type' => 'select',
+				'#options' => $options
+			);
+			$form['field_uwwnremoval_value'] = array(
+				'#type' => 'select',
+				'#options' => $options
+			);
+			$form['field_uwwpremoval_value'] = array(
+				'#type' => 'select',
+				'#options' => $options
+			);
+		}
+
+		if(
+			$form['#id'] == "views-exposed-form-waste-water-network-page" ||
+			$form['#id'] == 'views-exposed-form-uwwtp-map-page' ||
+			$form['#id'] == 'views-exposed-form-waste-water-network-openlayers-1' ||
+			$form['#id'] == 'views-exposed-form-waste-water-network-openlayers-2' ||
+			$form['#id'] == 'views-exposed-form-waste-water-network-openlayers-3' ||
+			$form['#id'] == 'views-exposed-form-uwwtp-treatment-page' ||
+			$form['#id'] == 'views-exposed-form-uwwtp-treatment-openlayers-2' ||
+			$form['#id'] == 'views-exposed-form-uwwtp-treatment-attachment-1' ||
+			$form['#id'] == 'views-exposed-form-agglomeration-page' ||
+			$form['#id'] == 'views-exposed-form-agglomeration-openlayers-1' ||
+			$form['#id'] == 'views-exposed-form-agglomeration-conformity-page' ||
+			$form['#id'] == 'views-exposed-form-agglomeration-conformity-openlayers-1' ||
+			$form['#id'] == 'views-exposed-form-data-deletion-page'
+		){
+
+			// Get all available years
+			$query = db_select('field_data_field_anneedata', 'a');
+			$query->fields('a', array('field_anneedata_value'));
+			$query->orderBy('field_anneedata_value', 'DESC');
+			$results = $query->execute();
+			$years = array();
+			while($record = $results->fetchAssoc()) {
+				$years[$record['field_anneedata_value']] = $record['field_anneedata_value'];
+			}
+			//dsm($years);
+
+			//$form_state['input']['field_anneedata_value'] = '2010';
+			$form['field_anneedata_value'] = array(
+				'#type' => 'select',
+				'#options' => $years,
+				//'#default_value' => array('2000' => '2000'),
+			);
+		}
+    if(in_array($form['#id'], array("views-exposed-form-uwwtp-map-page"))){
+		if(isset($form['field_physicalcapacityinput_value_op'])){
+			$cap_op_options= $form['field_physicalcapacityinput_value_op']['#options'];
+			unset($cap_op_options['between'], $cap_op_options['not between'], $cap_op_options['empty'], $cap_op_options['not empty']);
+			$form['field_physicalcapacityinput_value_op']['#options'] = $cap_op_options;
+		}
+		if(isset($form['field_uwwnuts_value'])){
+			$query = db_select('field_data_field_uwwnuts', 'nuts');
+				$query->fields('nuts', array('field_uwwnuts_value'));
+				$query->condition('deleted', 0,'=');
+				$query->groupBy('nuts.field_uwwnuts_value');//GROUP BY user ID
+			$result = $query->execute();
+			$nuts_options=array();
+			while($record = $result->fetchAssoc()) {
+				//dsm($record);
+				$nuts_options[$record['field_uwwnuts_value']]=$record['field_uwwnuts_value'];
+			}
+
+			$old = $form['field_uwwnuts_value'];
+			//dsm($old);
+			//dsm($form_state);
+			$form['field_uwwnuts_value'] = array(
+				'#type'=>'select',
+				'#options'=>$nuts_options,
+				'#default_value'=>$old['#default_value'],
+				'#empty_value'=>'',
+				'#empty_option'=>t('- All -')
+			);
+		}
+	}
+}
+
+// function uwwtd_debug_submit_handler($form, &$form_state){
+// 	//require_once ( dirname(__FILE__) . '/shpParser.php');
+// 	require_once ( dirname(__FILE__) . '/ShapeFile.inc.php');
+// 	$file = file_load($form_state['values']['uwwtd_file']);
+// 	$uri = $file->uri;
+//
+// 	// On upload le file et la fonction renvoie le nouveau nom du fichier
+// 	$ext = '.shp';
+// 	$newFile = uwwtd_file_upload($file, $ext);
+// 	$path = file_create_url($newFile->uri);
+// 	$shp = new ShapeFile($path, array('noparts' => false));
+// 	  $records = array();
+// 		foreach($shp->records as $record){
+// 		$dbf_data = $record->getDbfData();
+// 		$shp_data = $record->getShpData();
+//
+// 		//Dump the information
+// 		$obj = array(
+// 		  'type' => $shp->getShpTypeName($record->getShpType())
+// 		);
+//
+// 		$obj['shape'] = $shp_data;
+// 		$obj['meta'] = $dbf_data;
+//
+// 		$records[] = $obj;
+// 	}
+// 	dsm($records);
+// }
+
+
+
+
+// permission to view data pages
+function uwwtd_permission() {
+  return array(
+    'Data-management access' => array(
+      'title' => t('Access to the data management pages'),
+    )
+  );
+}
+
+function uwwtd_cron(){
+    $lastGen = variable_get('uwwtd_wfs_table', 0);
+    $mslevel_feed_table = 'UWWTD_FeedMSLevel_'.variable_get('siif_eru_country_code');
+	$agglolevel_feed_table = 'UWWTD_FeedAggloLevel_'.variable_get('siif_eru_country_code');
+
+ 	if((time() - $lastGen) > (60*60*24)){
+        // Requires postgres for DROP TABLE IF
+        db_query('DROP TABLE IF EXISTS wfs."UWWTD_UrbanWasteWaterTreatmentPlant";
+        CREATE TABLE wfs."UWWTD_UrbanWasteWaterTreatmentPlant"
+            AS SELECT * from public."UWWTD_UrbanWasteWaterTreatmentPlant" WHERE "siteId" IS NOT NULL;
+        ALTER TABLE wfs."UWWTD_UrbanWasteWaterTreatmentPlant"
+        ADD PRIMARY KEY ("siteId");
+
+        DROP TABLE IF EXISTS wfs."UWWTD_Agglomeration";
+        CREATE TABLE wfs."UWWTD_Agglomeration"
+            AS SELECT * from public."UWWTD_Agglomeration" WHERE "siteId" IS NOT NULL;
+        ALTER TABLE wfs."UWWTD_Agglomeration"
+        ADD PRIMARY KEY ("siteId");
+
+        DROP TABLE IF EXISTS wfs."UWWTD_ReceivingArea";
+        CREATE TABLE wfs."UWWTD_ReceivingArea"
+            AS SELECT * from public."UWWTD_ReceivingArea" WHERE "siteId" IS NOT NULL;
+        ALTER TABLE wfs."UWWTD_ReceivingArea"
+        ADD PRIMARY KEY ("siteId");
+
+        DROP TABLE IF EXISTS wfs."UWWTD_DischargePoint";
+        CREATE TABLE wfs."UWWTD_DischargePoint"
+            AS SELECT * from public."UWWTD_DischargePoint" WHERE "siteId" IS NOT NULL;
+        ALTER TABLE wfs."UWWTD_DischargePoint"
+        ADD PRIMARY KEY ("siteId");
+
+        DROP TABLE IF EXISTS wfs."'.$mslevel_feed_table.'";
+        CREATE TABLE wfs."'.$mslevel_feed_table.'"
+            AS SELECT * from public."'.$mslevel_feed_table.'" WHERE "siteId" IS NOT NULL;
+        ALTER TABLE wfs."'.$mslevel_feed_table.'"
+        ADD PRIMARY KEY ("siteId");
+        
+        DROP TABLE IF EXISTS wfs."'.$agglolevel_feed_table.'";
+        CREATE TABLE wfs."'.$agglolevel_feed_table.'"
+            AS SELECT * from public."'.$agglolevel_feed_table.'" WHERE "siteId" IS NOT NULL;
+        ALTER TABLE wfs."'.$agglolevel_feed_table.'"
+        ADD PRIMARY KEY ("siteId");
+        ');
+        
+        //============ Article 17 ====================
+        //====MS LEVEL
+        db_query('
+            DROP TABLE IF EXISTS wfs.art17_mslevel;
+            SELECT 
+                field_year_of_datas_value AS year_of_datas,
+                field_soeccode_value AS soeccode,
+                field_soecinvcol_value AS soecinvcol,
+                field_soecinvcomments_value AS soecinvcomments,
+                field_soecnumbias_value AS soecnumbias,
+                field_soecperiod_value AS soecperiod, 
+                field_soeclenghtcocs_value AS soeclenghtcocs,
+                field_soecinvias_value AS soecinvias,
+                field_soeceufunds_value AS soeceufunds,
+                field_soecjobs_value AS soecjobs, 
+                field_soecopcosts_value AS soecopcosts,
+                field_soecpop_value AS soecpop,
+                field_soeclenghtstcs_value AS soeclenghtstcs,
+                field_soeclenghtsacs_value AS soeclenghtsacs,
+                field_soecinvtp_value AS soecinvtp,
+                field_soeccapacity_value AS soeccapacity,
+                field_soecendyear_value AS soecendyear,
+                field_soecstartyear_value AS soecstartyear
+            INTO wfs.art17_mslevel
+            FROM 
+                {node} n 
+                LEFT JOIN {field_data_field_year_of_datas} year_of_datas ON n.vid=year_of_datas.revision_id
+                LEFT JOIN {field_data_field_soeccode} soeccode ON n.vid=soeccode.revision_id
+                LEFT JOIN {field_data_field_soecinvcol} soecinvcol ON n.vid=soecinvcol.revision_id
+                LEFT JOIN {field_data_field_soecinvcomments} soecinvcomments ON n.vid=soecinvcomments.revision_id
+                LEFT JOIN {field_data_field_soecnumbias} soecnumbias ON n.vid=soecnumbias.revision_id
+                LEFT JOIN {field_data_field_soecperiod} soecperiod ON n.vid=soecperiod.revision_id
+                LEFT JOIN {field_data_field_soeclenghtcocs} soeclenghtcocs ON n.vid=soeclenghtcocs.revision_id
+                LEFT JOIN {field_data_field_soecinvias} soecinvias ON n.vid=soecinvias.revision_id
+                LEFT JOIN {field_data_field_soeceufunds} soeceufunds ON n.vid=soeceufunds.revision_id
+                LEFT JOIN {field_data_field_soecjobs} soecjobs ON n.vid=soecjobs.revision_id
+                LEFT JOIN {field_data_field_soecopcosts} soecopcosts ON n.vid=soecopcosts.revision_id
+                LEFT JOIN {field_data_field_soecpop} soecpop ON n.vid=soecpop.revision_id
+                LEFT JOIN {field_data_field_soeclenghtstcs} soeclenghtstcs ON n.vid=soeclenghtstcs.revision_id
+                LEFT JOIN {field_data_field_soeclenghtsacs} soeclenghtsacs ON n.vid=soeclenghtsacs.revision_id
+                LEFT JOIN {field_data_field_soecinvtp} soecinvtp ON n.vid=soecinvtp.revision_id
+                LEFT JOIN {field_data_field_soeccapacity} soeccapacity ON n.vid=soeccapacity.revision_id
+                LEFT JOIN {field_data_field_soecendyear} soecendyear ON n.vid=soecendyear.revision_id
+                LEFT JOIN {field_data_field_soecstartyear} soecstartyear ON n.vid=soecstartyear.revision_id
+            WHERE n.status = 1
+                AND n.type =\'article_17_ms_level\'
+                AND field_soeccode_value IS NOT NULL
+            ORDER BY year_of_datas;
+        ');
+        //===Agglomeration
+        db_query('
+            DROP TABLE IF EXISTS wfs.art17_agglomeration;
+            SELECT 
+                field_anneedata_value AS year_of_data,
+                field_art17agg_aggcode_value AS aggcode,
+                field_art17agg_aggname_value AS aggname,
+                field_art17_flaggstatus_value AS flaggstatus,
+                field_art17_flaggloan_value AS flaggloan,
+                field_art17_flaggloanname_value AS flaggloanname,
+                field_art17_flaggotherfundname_value AS flaggotherfundname,
+                field_art17_flaggreasons_value AS flaggreasons,
+                field_art17_flaggmeasures_value AS flaggmeasures,
+                field_art17_flagginv_value AS flagginv,
+                field_art17_flaggeufundname_value AS flaggeufundname,
+                field_art17_flaggeufund_value AS flaggeufund,
+                field_art17_flaggcomments_value AS flaggcomments,
+                field_art17_flaggexpload_value AS flaggexpload,
+                field_art17_flaggexploadcoll_value AS flaggexploadcoll,
+                field_art17_flaggotherfund_value AS flaggotherfund,
+                field_art17_flaggexploadias_value AS flaggexploadias,
+                field_art17_flaggexpecdatestart_value AS flaggexpecdatestart,
+                field_art17_flaggexpecdatestartw_value AS flaggexpecdatestartw,
+                field_art17_flaggexpecdatecomple_value AS flaggexpecdatecomple
+            INTO wfs.art17_agglomeration
+            FROM {node} n
+                LEFT JOIN {field_data_field_anneedata} anneedata ON n.vid=anneedata.revision_id
+                LEFT JOIN {field_data_field_art17agg_aggcode} aggcode ON n.vid=aggcode.revision_id
+                LEFT JOIN {field_data_field_art17agg_aggname} aggname ON n.vid=aggname.revision_id
+                LEFT JOIN {field_data_field_art17_flaggstatus} flaggstatus ON n.vid=flaggstatus.revision_id
+                LEFT JOIN {field_data_field_art17_flaggloan} flaggloan ON n.vid=flaggloan.revision_id
+                LEFT JOIN {field_data_field_art17_flaggloanname} flaggloanname ON n.vid=flaggloanname.revision_id
+                LEFT JOIN {field_data_field_art17_flaggotherfundname} flaggotherfundname ON n.vid=flaggotherfundname.revision_id
+                LEFT JOIN {field_data_field_art17_flaggreasons} flaggreasons ON n.vid=flaggreasons.revision_id
+                LEFT JOIN {field_data_field_art17_flaggmeasures} flaggmeasures ON n.vid=flaggmeasures.revision_id
+                LEFT JOIN {field_data_field_art17_flagginv} flagginv ON n.vid=flagginv.revision_id
+                LEFT JOIN {field_data_field_art17_flaggeufundname} flaggeufundname ON n.vid=flaggeufundname.revision_id
+                LEFT JOIN {field_data_field_art17_flaggeufund} flaggeufund ON n.vid=flaggeufund.revision_id
+                LEFT JOIN {field_data_field_art17_flaggcomments} flaggcomments ON n.vid=flaggcomments.revision_id
+                LEFT JOIN {field_data_field_art17_flaggexpload} flaggexpload ON n.vid=flaggexpload.revision_id
+                LEFT JOIN {field_data_field_art17_flaggexploadcoll} flaggexploadcoll ON n.vid=flaggexploadcoll.revision_id
+                LEFT JOIN {field_data_field_art17_flaggotherfund} flaggotherfund ON n.vid=flaggotherfund.revision_id
+                LEFT JOIN {field_data_field_art17_flaggexploadias} flaggexploadias ON n.vid=flaggexploadias.revision_id
+                LEFT JOIN {field_data_field_art17_flaggexpecdatestart} flaggexpecdatestart ON n.vid=flaggexpecdatestart.revision_id
+                LEFT JOIN {field_data_field_art17_flaggexpecdatestartw} flaggexpecdatestartw ON n.vid=flaggexpecdatestartw.revision_id
+                LEFT JOIN {field_data_field_art17_flaggexpecdatecomple} flaggexpecdatecomple ON n.vid=flaggexpecdatecomple.revision_id
+            WHERE n.status = 1
+                AND n.type=\'article_17_agglomeration\'
+                AND field_art17agg_aggcode_value IS NOT NULL
+            ORDER BY year_of_data;
+        ');
+        //=== UWWTP
+        db_query('
+            DROP TABLE IF EXISTS wfs.art17_uwwtp;
+            SELECT 
+                field_anneedata_value AS year_of_data,
+                field_art17uwwtp_uwwcode_value AS uwwcode,
+                field_art17uwwtp_uwwname_value AS uwwname,
+                field_art17_flatpstatus_value AS flatpstatus,
+                field_art17_flatpmeasures_value AS flatpmeasures,
+                field_art17_flatpeufundname_value AS flatpeufundname,
+                field_art17uwwtp_aggcode_value AS aggcode, 
+                field_art17uwwtp_aggname_value AS aggname,
+                field_art17_flatpexpload_value AS flatpexpload,
+                field_art17_flatpexpcapacity_value AS flatpexpcapacity, 
+                field_art17_flatptexpectreatment_value AS flatptexpectreatment,
+                field_art17_flatpreasons_value AS flatpreasons, 
+                field_art17_flatpinv_value AS flatpinv, 
+                field_art17_flatpeufund_value AS flatpeufund, 
+                field_art17_flatpcomments_value AS flatpcomments, 
+                field_art17_flatpexploadtruck_value AS flatpexploadtruck,
+                field_art17_flatpotherfund_value AS flatpotherfund, 
+                field_art17_flatpotherfundname_value AS flatpotherfundname, 
+                field_art17_flatploan_value AS flatploan, 
+                field_art17_flatploanname_value AS flatploanname, 
+                field_art17_flatpexpecdatestart_value AS flatpexpecdatestart, 
+                field_art17_flatpexpecdatestartw_value AS flatpexpecdatestartw, 
+                field_art17_flatpexpecdatecomple_value AS flatpexpecdatecomple, 
+                field_art17_flatpexpecdateperfor_value AS flatpexpecdateperfor
+            INTO wfs.art17_uwwtp
+            FROM {node} n
+                LEFT JOIN {field_data_field_anneedata} anneedata ON n.vid=anneedata.revision_id
+                LEFT JOIN {field_data_field_art17uwwtp_uwwcode} uwwcode ON n.vid=uwwcode.revision_id
+                LEFT JOIN {field_data_field_art17uwwtp_uwwname} uwwname  ON n.vid=uwwname.revision_id
+                LEFT JOIN {field_data_field_art17_flatpstatus}  flatpstatus  ON n.vid=flatpstatus.revision_id
+                LEFT JOIN {field_data_field_art17_flatpmeasures}  flatpmeasures ON n.vid=flatpmeasures.revision_id
+                LEFT JOIN {field_data_field_art17_flatpeufundname}  flatpeufundname ON n.vid=flatpeufundname.revision_id
+                LEFT JOIN {field_data_field_art17uwwtp_aggcode}   aggcode   ON n.vid=aggcode.revision_id
+                LEFT JOIN {field_data_field_art17uwwtp_aggname} aggname  ON n.vid=aggname.revision_id
+                LEFT JOIN {field_data_field_art17_flatpexpload}  flatpexpload   ON n.vid=flatpexpload.revision_id
+                LEFT JOIN {field_data_field_art17_flatpexpcapacity}   flatpexpcapacity   ON n.vid=flatpexpcapacity.revision_id
+                LEFT JOIN {field_data_field_art17_flatptexpectreatment}  flatptexpectreatment  ON n.vid=flatptexpectreatment.revision_id
+                LEFT JOIN {field_data_field_art17_flatpreasons}  flatpreasons   ON n.vid=flatpreasons.revision_id
+                LEFT JOIN {field_data_field_art17_flatpinv}   flatpinv   ON n.vid=flatpinv.revision_id
+                LEFT JOIN {field_data_field_art17_flatpeufund}   flatpeufund ON n.vid=flatpeufund.revision_id
+                LEFT JOIN {field_data_field_art17_flatpcomments}   flatpcomments   ON n.vid=flatpcomments.revision_id
+                LEFT JOIN {field_data_field_art17_flatpexploadtruck}  flatpexploadtruck ON n.vid= flatpexploadtruck.revision_id
+                LEFT JOIN {field_data_field_art17_flatpotherfund} flatpotherfund   ON n.vid=flatpotherfund.revision_id
+                LEFT JOIN {field_data_field_art17_flatpotherfundname}  flatpotherfundname   ON n.vid=flatpotherfundname.revision_id
+                LEFT JOIN {field_data_field_art17_flatploan}   flatploan   ON n.vid=flatploan.revision_id
+                LEFT JOIN {field_data_field_art17_flatploanname}  flatploanname   ON n.vid=flatploanname.revision_id
+                LEFT JOIN {field_data_field_art17_flatpexpecdatestart} flatpexpecdatestart  ON n.vid=flatpexpecdatestart.revision_id
+                LEFT JOIN {field_data_field_art17_flatpexpecdatestartw}   flatpexpecdatestartw  ON n.vid=flatpexpecdatestartw.revision_id
+                LEFT JOIN {field_data_field_art17_flatpexpecdatecomple}   flatpexpecdatecomple  ON n.vid=flatpexpecdatecomple.revision_id
+                LEFT JOIN {field_data_field_art17_flatpexpecdateperfor} flatpexpecdateperfor ON n.vid=flatpexpecdateperfor.revision_id
+            WHERE n.status = 1 
+                AND n.type =\'article_17_uwwtp\'
+                AND field_art17uwwtp_uwwcode_value IS NOT NULL
+            ORDER BY year_of_data;
+        ');
+        variable_set('uwwtd_wfs_table', time());
+ 	}
+}
+
+
+
+//=============================Fonction de gestion des erreurs de l'import======================
+function uwwtd_errors_get_category($cat=null){
+    $categories = array(
+        0=>'Input',
+        1=>'Linking',
+        2=>'Geometry',
+        3=>'Conformity',
+        4=>'Format',
+    );
+    if($cat){
+        if(isset($categories[$cat])) return $categories[$cat];
+        else return false;
+    }
+    else return $categories;
+}
+function uwwtd_errors_get_types($type=null){
+    $types = array(
+        0=>'Notification',
+        1=>'Warning',
+        2=>'Error',
+    );
+    if($type){
+        if(isset($types[$type])) return $types[$type];
+        else return false;
+    }
+    else return $types;
+}
+//=========================TODO for gettings error with an entity_id & entity_type
+function uwwtd_errors_get_errors($entity_id, $entity_type){
+    $errors = array();
+
+    //TODO db_select();
+
+    return $errors;
+}
+
+
+function uwwtd_block_info() {
+
+  $blocks['map_home'] = array(
+        'info' => t('Map home'),
+        'cache' => DRUPAL_NO_CACHE,
+    );
+    $blocks['uwwtd_search_block'] = array(
+        'info' => t('Block search [UWWTD]'),
+        'status'=>true,
+        'visibility' => BLOCK_VISIBILITY_NOTLISTED,
+        'region'=>'navigation'
+    );
+  return $blocks;
+}
+
+function uwwtd_get_cache_key_agglomeration($option)
+{
+    return 'data_agglomeration_' . $option['field_anneedata_value'];
+}
+function uwwtd_get_cache_key_sensitive_area($option)
+{
+    return 'data_sensitive_area_' . $option['field_anneedata_value'];
+}
+
+function uwwtd_get_cache_key_uwwtp($option)
+{
+    return 'data_uwwtp_' . $option['field_anneedata_value'];
+}
+
+function uwwtd_get_cache_key_dcp($option)
+{
+    return 'data_dcp_' . $option['field_anneedata_value'];
+}
+
+function uwwtd_get_cache_key_block_home()
+{
+    return 'data_block_map_home';
+}
+
+function uwwtd_is_user_anonymous()
+{
+    global $user;
+    return ($user->uid == 0);
+}
+
+function uwwtd_get_cache_key_page_agglo_compliance($option)
+{
+    return 'page_agglomeration_compliance_' . $option['field_anneedata_value'];
+}
+function uwwtd_get_cache_key_page_sensitive_area($option)
+{
+    return 'page_sensitive_area_' . $option['field_anneedata_value'];
+}
+function uwwtd_get_cache_key_page_dcp($option)
+{
+    return 'page_dcp_' . $option['field_anneedata_value'];
+}
+
+function uwwtd_get_cache_key_page_agglo_treatment($option)
+{
+    return 'page_agglomeration_treatment_' . $option['field_anneedata_value'];
+}
+
+function uwwtd_get_cache_key_page_uwwtp_treatment($option)
+{
+    return 'page_uwwtp_treatment_' . $option['field_anneedata_value'];
+}
+
+function uwwtd_get_cache_key_page_uwwtp_compliance($option)
+{
+    return 'page_uwwtp_compliance_' . $option['field_anneedata_value'];
+}
+
+function uwwtd_get_cache_key_page_uwwtp_pressure($option)
+{
+    return 'page_uwwtp_pressure_' . $option['field_anneedata_value'];
+}
+
+function uwwtd_block_view($delta = ''){
+    $block = array();
+    switch ($delta) {
+        
+        case 'uwwtd_search_block':
+            $form = drupal_get_form('uwwtd_search_block_form');
+            if($form) $block['content'] =drupal_render($form);
+          break;
+        case 'map_home':
+            module_load_include('inc','uwwtd','inc/pages');
+            $cache = '';
+            $cache_name = uwwtd_get_cache_key_block_home();
+            //we always need to build the map because openlayer set some css and js
+            $preset_name = 'waste_water_treatment_network_map';   //layer agglomeration_treatment 'Agglomeration connection map and list'
+            $preset = openlayers_preset_load($preset_name);
+            
+            //$put_in_cache = uwwtd_is_user_anonymous();
+            $put_in_cache = false;//uwwtd_is_user_anonymous();
+            if (UWWTD_CACHE_ACTIVE === true && true === $put_in_cache) {
+                $cache = cache_get($cache_name, 'cache_block');
+            }
+            if (!empty($cache) && isset($cache->data) && !empty($cache->data)) { 
+                $block['content'] = $cache->data;
+            } 
+            else {
+                $option['field_anneedata_value'] = uwwtd_get_max_annee();
+
+                $data = uwwtd_get_data_agglomeration($option);
+                //     dsm($data);
+                //e.vincent / bruno want to show only agglo > 2000
+                $filter = array();
+                $filter['filter'] = array();
+                $filter_force = array();
+                $filter_force['filter']['field_agggenerated_value_op'] = '>';
+                $filter_force['filter']['field_agggenerated_value']['value'] = variable_get('min_aggenerated_display', '1999');
+                if (variable_get('display_only_active', '1') == 1) {
+                    $filter_force['filter']['field_status_value'] = '1';
+                }
+                uwwtd_filter_data($filter, $data, $filter_force);
+                //     uwwtd_filter_data($filter, $data);
+                //     dsm($data);
+                $optionstyle = array();
+                $optionstyle['default_color'] = '#F2EB0C';
+                //$optionstyle['color']['field'] = 'field_aggcompliance_value_format';
+                $optionstyle['weight']['list'] = uwwtd_get_point_size_from_preset($preset, 'openlayers_plus_behavior_scalepoints');
+                $optionstyle['weight']['field'] = 'field_agggenerated_value';
+                $optionstyle['popup_title_type'] = 'agglomeration';
+                $optionstyle['popup'] = array(
+                    'field_agggenerated_value_format' => array('label' => 'Generated load (p.e.)'),
+                    'field_aggcompliance_value_format' => array('label' => 'Compliance'),
+                    'field_aggart3compliance_value_format' => array('label' => 'Connection compliance'),
+                    'field_aggart4compliance_value_format' => array('label' => '2nd treatment compliance'),
+                    'field_aggart5compliance_value_format' => array('label' => '3rd treatment compliance'),
+                );
+                //dsm($data);
+                $features['agglomerations'] = uwwtd_build_feature($data, $optionstyle, $returnvalue, 'agglomerations');
+                unset($data);
+                
+                $data = uwwtd_get_data_uwwtp($option);
+                $filter = array();
+                $filter['filter'] = array();
+                $filter_force = array();
+                if (variable_get('display_only_active', '1') == 1) {
+                    $filter_force['filter']['field_status_value'] = '1';
+                }
+                uwwtd_filter_data($filter, $data, $filter_force);
+                $optionstyle = array();
+                $optionstyle['default_color'] = '#6495ed';
+                $optionstyle['popup_title_type'] = 'treatment-plant';
+                $optionstyle['popup'] = array(
+                    'field_uwwcompliance_value_format' => array('label' => 'Compliance'),
+                    'field_uwwprimarytreatment_value_format' => array('label' => 'Primary treatment'),
+                    'field_uwwsecondarytreatment_value_format' => array('label' => 'Secondary treatment'),
+                    'field_uwwnremoval_value_format' => array('label' => 'N-removal'),
+                    'field_uwwpremoval_value_format' => array('label' => 'P-removal'),
+                );
+                $features['uwwtp'] = uwwtd_build_feature($data, $optionstyle, $returnvalue, 'uwwtp');
+                unset($data);
+                
+                $data = uwwtd_get_data_dcp($option);
+                $optionstyle = array();
+                $optionstyle['default_color'] = '#ff5656';
+                $optionstyle['popup_title_type'] = 'discharge-point';
+                $features['dcp'] = uwwtd_build_feature($data, $optionstyle, $returnvalue, 'dcp');
+                unset($data);
+                
+                $map    = openlayers_build_map($preset->data);
+                $block['content'] =  uwwtd_build_map($map, $features);
+                unset($map);
+                unset($features);
+                if (true === $put_in_cache) {
+                    cache_set($cache_name, $block['content'], 'cache_block', CACHE_PERMANENT);
+                }
+            }
+          break;
+    }
+    return $block;
+}
+
+function uwwtd_search_block_form($form, &$form_state){
+    $form['search_api_views_fulltext'] = array(
+        '#type'=>'textfield',
+        '#size'=>30,
+        '#default_value'=>'',
+        '#attached'=>array(
+            'css'=>array('sites/all/modules/search_api_autocomplete/search_api_autocomplete.css'),
+            'js'=>array('sites/all/modules/search_api_autocomplete/search_api_autocomplete.js')
+        ),
+        '#autocomplete_path'=>'search_api_autocomplete/search_api_views_search/-',
+        '#attributes'=>array(
+            'class'=>array('auto_submit', 'search-block-input'),
+            'data-search-api-autocomplete-search'=>'search_api_views_search'
+        ),
+    );
+    $form['type'] = array(
+        '#type'=>'hidden',
+        '#value'=>'All',
+    );
+    $form['submit'] = array(
+        '#type'=>'submit',
+        '#value'=>'<span class="glyphicon glyphicon-search"></span>',
+        '#id'=>'edit-submit-search',
+    );
+    $form['#process'] = array('_bootstrap_process_element');
+    
+    //$form['#action'] = base_path().'search';
+
+    return $form;
+    
+}
+
+function uwwtd_search_block_form_submit($form, &$form_state){
+    //dsm($form_state['values']);
+    drupal_goto('search', [
+        'query'=>[
+            'search_api_views_fulltext'=>$form_state['values']['search_api_views_fulltext'],
+            'type'=>$form_state['values']['type']
+        ]
+    ]);
+}
+
+//nd@oieau.fr 20/10/2016 . There is a bug in this function for building the link
+function uwwtd_get_url_path($type, $param = array())
+{
+    $path = '';
+    switch($type) {
+        case 'agglomeration':
+        case 'treatment-plant':
+        case 'discharge-point':
+        case 'receiving-area':
+            $path .= $type;
+            foreach ($param as $value) {
+                $path.= '/' . str_replace('_', '',$value);
+            }
+            if(drupal_valid_path($path)) return $path;
+            else{
+                $path = '';
+                $path .= $type;
+                foreach ($param as $value) {
+                    $path.= '/' . $value;
+                }
+                return $path;
+            }
+            break;
+    }
+    return $path;
+}
+
+function uwwtd_update_cache_data($list_year = array())
+{
+//     dsm(__FUNCTION__);
+    module_load_include('inc','uwwtd','inc/pages');
+    if (empty($list_year)) {
+        $list_year = uwwtd_get_all_year();
+    }
+    foreach($list_year as $year) {
+        $option['field_anneedata_value'] = $year;
+        //clear last cache with empty string
+        cache_set(uwwtd_get_cache_key_agglomeration($option), '', 'cache', 10);
+        cache_set(uwwtd_get_cache_key_uwwtp($option), '', 'cache', 10);
+        cache_set(uwwtd_get_cache_key_dcp($option), '', 'cache', 10);
+
+        //calculate new cache
+        uwwtd_get_data_agglomeration($option['field_anneedata_value']);
+        uwwtd_get_data_uwwtp($option['field_anneedata_value']);
+        uwwtd_get_data_dcp($option['field_anneedata_value']);
+
+        //clear cachhe block and page
+        cache_set(uwwtd_get_cache_key_block_home($option), '', 'cache_block', 10);
+
+        cache_set(uwwtd_get_cache_key_page_agglo_compliance($option), '', 'cache_page', 10);
+        cache_set(uwwtd_get_cache_key_page_agglo_treatment($option), '', 'cache_page', 10);
+        cache_set(uwwtd_get_cache_key_page_uwwtp_treatment($option), '', 'cache_page', 10);
+        cache_set(uwwtd_get_cache_key_page_uwwtp_compliance($option), '', 'cache_page', 10);
+    }
+}
+
+function uwwtd_format_number($number, $precision = 0)
+{
+  if ($number === '-') {
+    return $number;
+  }
+    return number_format($number, $precision, '.', ',');
+}
+function uwwtd_format_decimal($number, $precision = 1)
+{
+    return number_format($number, $precision, '.', ',');
+}
+
+function uwwtd_get_point_size_from_preset($preset, $behaviour)
+{
+// dsm($behaviour);
+// dsm($preset);   
+
+    $weightClass = $preset->data['behaviors'][$behaviour]['arbitrary_classes'];
+    $configuredWeight = explode("\n", $weightClass);
+// dsm($configuredWeight);
+    $list = array();
+    $numWeight = 1;
+    foreach($configuredWeight as $oneweight) {
+        $tmp = explode('|', $oneweight);
+        $list[ $numWeight ] = isset($tmp[1]) ? (int)$tmp[1] : 0;
+        $numWeight++;
+    }
+// dsm($list);
+    return $list;
+}
+
+// $GLOBALS['uwwtd']['ui']['compliance_color']  = array(
+//     'C' => "#4f91e1",
+//     'NR' => "#a2a2a2",
+//     'NC' => "#d93c3c",
+//     'NI' => "#6b6b6b",
+// );
+function uwwtd_get_point_color_from_preset($preset)
+{
+    $configuredColor = $preset->data['behaviors']['openlayers_plus_behavior_scalepoints']['fields_colors_values'];
+    $configuredColor = explode("\n", $configuredColor);
+    $list = array();
+    foreach($configuredColor as $onecolor) {
+        $tmp = explode('|', $onecolor);
+        $list[ $tmp[1] ] = $tmp[2];
+    }
+    return $list;
+}
+
+//     $optionstyle['piechart'] = array(
+//         'field_aggc1_value' => array(
+//             'label' => 'Collective system',
+//             'color' => '#74FFE0',
+//         ),
+//         'field_aggc2_value' => array(
+//             'label' => 'Individual and Appropriate Systems (IAS)',
+//             'color' => '#BD8842',
+//         ),
+//         'field_aggpercwithouttreatment_value' => array(
+//             'label' => 'Discharge without treatment',
+//             'color' => '#C00000',
+//         ),
+//     );
+function uwwtd_get_piechart_from_preset($preset, $behaviour)
+{
+// dsm($preset);
+    $configuredPiechart = $preset->data['behaviors'][$behaviour]['fields_series'];
+    $configuredPiechart = explode("\n", $configuredPiechart);
+// dsm($configuredPiechart);
+    $list = array();
+    foreach($configuredPiechart as $onefield) {
+        $tmp = explode('|', $onefield);
+        $list[ $tmp[0] . '_value' ] = array(
+            'label' => $tmp[1],
+            'color' => $tmp[2],
+        );
+    }
+// dsm($list);
+    return $list;
+}
+
+function uwwtd_get_svg_piechart($i, $values, $optionstyle, $weightstyle)
+{
+	$chartelem = "";
+
+    $radius = $weightstyle['pointRadius'];
+    $cx = $cy = $radius;
+    $opacity = $weightstyle['fillOpacity'];
+    $strokeWidth = $weightstyle['strokeWidth'];
+
+	$sum = 0;
+	foreach ($optionstyle['piechart'] as $field=>$detail) {
+        if ($values[$field] == 0) {
+            $values[$field] = 1;
+        }
+		$sum += $values[$field];
+	}
+	$deg = $sum/360; // one degree
+	$jung = $sum/2; // necessary to test for arc type
+
+	/* Data for grid, circle, and slices */
+
+	$dx = $radius; // Starting point:
+	$dy = 0; // first slice starts in the East
+	$oldangle = 0;
+
+	/* Loop through the slices */
+    foreach ($optionstyle['piechart'] as $field=>$detail) {
+		$angle = $oldangle + $values[$field]/$deg; // cumulative angle
+		$x = cos(deg2rad($angle)) * $radius; // x of arc's end point
+		$y = sin(deg2rad($angle)) * $radius; // y of arc's end point
+
+		$colour = $optionstyle['piechart'][$field]['color'];
+
+		if ($values[$field] > $jung) {
+			// arc spans more than 180 degrees
+			$laf = 1;
+		}
+		else {
+			$laf = 0;
+		}
+
+		$ax = $cx + $x; // absolute $x
+		$ay = $cy + $y; // absolute $y
+		$adx = $cx + $dx; // absolute $dx
+		$ady = $cy + $dy; // absolute $dy
+		$chartelem .= "\n";
+        $chartelem .= "\n";
+        $chartelem .= "<g class=\"arc\" >\n";
+		$chartelem .= "<path d=\"M$cx,$cy "; // move cursor to center
+		$chartelem .= " L$adx,$ady "; // draw line away away from cursor
+		$chartelem .= " A$radius,$radius 0 $laf,1 $ax,$ay "; // draw arc
+		$chartelem .= " z\" "; // z = close path
+        $chartelem .= ' style="fill: '.$colour.'; stroke: rgb(34, 34, 34); opacity: '.$opacity.'; stroke-width: '.$strokeWidth.';" stroke-linejoin="round"/>';
+        $chartelem .= "</g>\n";
+		$dx = $x; // old end points become new starting point
+		$dy = $y; // id.
+		$oldangle = $angle;
+	}
+
+	return  '<svg style="display:none;" id="pie_'.$i.'">
+                '
+             . $chartelem
+             . '
+             </svg>';
+}
+
+function uwwtd_export_data($type_export, $title, $header, $rows){
+    $filename = tempnam('public://tmp/', 'export');
+    $r = fopen($filename, 'wb');
+    switch($type_export) {
+        case 'csv':
+            fputcsv($r, $header, ';');
+            foreach($rows as $row) {
+                fputcsv($r, $row['data'], ';');
+            }
+            break;
+        case 'xls':
+            fputs($r, '<html>
+                        <head>
+                        <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+                        </head>
+                        <body>
+                        <table>
+                        <thead>
+                        ');
+            fputs($r, '<tr><th>' . implode('</th><th>', $header) . '</th></tr>');
+            fputs($r, '</thead><tbody>');
+            foreach($rows as $row) {
+                fputs($r, '<tr><td>' . implode('</td><td>', $row['data']) . '</td></tr>');
+            }
+            fputs($r, '</tbody></table></body></html>');
+            break;
+        default:
+            $type_export = '';
+            break;
+    }
+    fclose($r);
+//     dsm(file_get_contents($filename));
+//     return;
+    ini_set("auto_detect_line_endings", false); //for Mac user
+    $aHeaders = array(
+          'Content-Type'        => 'application/octet-stream',
+          'Content-Disposition' => 'attachment; filename="'.$title.'.'.$type_export.'"',
+          'Expires'             => '0',
+          'Cache-Control'       => 'must-revalidate',
+          'Pragma'              =>'public',
+          'Content-Length'      => filesize($filename),
+      );
+    foreach ($aHeaders as $sName => $sValue) {
+        drupal_add_http_header($sName, $sValue);
+    }
+
+    readfile($filename);
+    unlink($filename);
+    exit();
+}
+/*
+function uwwtd_form($form, &$form_state) {
+	if($form['element']['#action'] == '/ap_uwwtd_si/stats/graphs'){
+
+
+
+		// Get available years for data
+		$query = db_select('field_data_field_anneedata', 'a');
+		$query->fields('a', array('field_anneedata_value'));
+		$query->orderBy('field_anneedata_value', 'DESC');
+		$results = $query->execute();
+		$years = array('all' => 'Show all');
+		while($record = $results->fetchAssoc()) {
+			$years[$record['field_anneedata_value']] = $record['field_anneedata_value'];
+		}
+		$form['year'] = array(
+				'#title' => t('Year'),
+				'#type' => 'select',
+				'#options' => $years,
+				'#default_value' => isset($form_state['values']['year']) ? $form_state['values']['year'] : 'all',
+		);
+
+
+
+
+
+
+
+		dpm($form);
+	}
+
+	return $form;
+}
+*/
+
+/**
+ *
+ */
+function uwwtd_page_download()
+{
+    $title = 'Download';
+    drupal_set_title($title);
+
+    $page = ''
+            . '<h1>'.$title.'</h1>'
+    ;
+    return $page;
+}
+
+/**
+ * hook_node_delete
+ * delete all error whose reference this node
+ */
+function uwwtd_node_delete($node) {
+//     dsm($node);
+	if (true === in_array($node->type, array(
+       'agglomeration',
+       'agglo_uww',
+       'big_city',
+       'discharge_point',
+       'ms_level',
+       'receiving_area',
+       'uwwtp',
+        ))) {
+//         dsm('entity_id ' . $node->nid);
+		db_delete('uwwtd_import_errors')
+        ->condition('entity_id', $node->nid, '=')
+        ->execute();
+	}
+}
+
+function uwwtd_get_national_stat_str($year){
+	module_load_include('inc','uwwtd','inc/pages');
+    $option['field_anneedata_value'] = $year;
+	$dataUwwtp = uwwtd_get_data_uwwtp($option);
+	$dataAggl = uwwtd_get_data_agglomeration($option);
+
+	$nbGeneratedLoad = 0;
+	$nbCollectingSystem = 0;
+	$nbPrimaryTreatement = 0;
+	$nbSecondaryTreatement = 0;
+	$nbOtherTreatement = 0;
+	$nbPhysicalCapacity = 0;
+	$nbIAS = 0;
+    $nbUrban = 0;
+	foreach($dataAggl as $agglo){
+        if($agglo['field_agggenerated_value']>=2000 && $agglo['field_status_value']==1){
+            $nbGeneratedLoad = $agglo['field_agggenerated_value']+ $nbGeneratedLoad;
+            $aggloCollectingSystem = ($agglo['field_aggc1_value'] /100) * $agglo['field_agggenerated_value'];
+            $nbCollectingSystem = $aggloCollectingSystem + $nbCollectingSystem;
+
+            $aggloIAS = ($agglo['field_aggc2_value'] /100) * $agglo['field_agggenerated_value'];
+            $nbIAS = $aggloIAS + $nbIAS;
+            $nbUrban++;
+        }
+	}
+    $uwwtp_ids = [];
+	foreach($dataUwwtp as $uwwtp){        
+        if($uwwtp['field_status_value']==1 && !in_array($uwwtp['nid'], $uwwtp_ids)){
+            if($uwwtp['field_uwwtreatmenttype_value'] == "P"){
+                $nbPrimaryTreatement = $nbPrimaryTreatement+1;
+            }elseif($uwwtp['field_uwwtreatmenttype_value'] == "S"){
+                $nbSecondaryTreatement = $nbSecondaryTreatement +1;
+            }elseif($uwwtp['field_uwwtreatmenttype_value'] == "MS"){
+                $nbOtherTreatement = $nbOtherTreatement+1;
+            }
+            $nbPhysicalCapacity = $uwwtp['field_physicalcapacityactivity_value']+ $nbPhysicalCapacity;
+            //Keep id of uwwtp in memory in order to prevent double counting
+            $uwwtp_ids[] = $uwwtp['nid'];
+        }
+	}
+	$nbCollectingSystem = $nbCollectingSystem *100 / $nbGeneratedLoad;
+	$totalCollectingSystem= number_format($nbCollectingSystem, 0, ".", " ");
+	$nbIAS =$nbIAS *100 / $nbGeneratedLoad;
+	$totalIAS = number_format($nbIAS, 0, ".", " ");
+
+	$annee = $option['field_anneedata_value'];
+	//$nbUrban = count($dataAggl);
+	$nbGeneratedLoad = number_format($nbGeneratedLoad, 0, ".", " ");
+	$nbPhysicalCapacity = number_format($nbPhysicalCapacity, 0, ".", " ");
+    $output ='';
+	$output.=   t("In @year, @country had @nbUrban urban waste water agglomerations of more then 2 000 population equivalent (p.e).", ['@year'=>$annee, '@country'=>variable_get('siif_eru_country_name'), '@nbUrban'=>$nbUrban])." ";
+	$output.=   t("These agglomerations generated a total load of @nbGeneratedLoad p.e. @totalCollectingSystem% of this load is connected to collecting systems and @totalIAS% addressed through Individual and Appropriate Systems (storage or septic tanks, micro-stations,...).", ['@nbGeneratedLoad'=>$nbGeneratedLoad, '@totalCollectingSystem'=>$totalCollectingSystem, '@totalIAS'=>$totalIAS])." ";
+	$output.=   t("These agglomerations are connected to")." ";
+    if($nbPrimaryTreatement>0) $output.=   t("@nbPrimaryTreatement primary treatment plant", ['@nbPrimaryTreatement'=>$nbPrimaryTreatement]).", "; 
+    $output.=   t("@nbSecondaryTreatement secondary treatment plants", ['@nbSecondaryTreatement'=>$nbSecondaryTreatement])." and ";
+    $output.=   t("@nbOtherTreatement more stringent treatment plants.", [ '@nbOtherTreatement'=>$nbOtherTreatement])." ";
+	$output.=   t("All these treatment plants have a total design capacity of @nbPhysicalCapacity p.e. ", ['@nbPhysicalCapacity'=>$nbPhysicalCapacity])." ";
+    return $output;
+}
+//hook_wms_getlegend_alter
+function uwwtd_wms_getlegend_alter(&$result, &$url){
+    parse_str($url['query'], $params);
+    if($result!='' && !$url["processed"]){
+        if($url['host']=='maps.oieau.fr'){
+            $result = '<div class="legend-label">'.t($params['LAYER']).'</div><div  class="legend-img">'.$result.'</div>';
+
+        }
+        elseif($url['host']=='bio.discomap.eea.europa.eu'){
+            $out = '';
+            if($params['LAYER']=='0'){
+                $out.= '<div class="legend-label">'.t('Natura 2000').'</div><div  class="legend-img">'.$result.'</div>';
+            }
+            if($params['LAYER']=='1'){
+                $out.= '<div class="legend-label">'.t('Birds Directive Sites (SPA)').'</div><div  class="legend-img">'.$result.'</div>';
+            }
+            if($params['LAYER']=='2'){
+                $out.= '<div class="legend-label">'.t('Habitats Directive Sites (pSCI, SCI or SAC)').'</div><div  class="legend-img">'.$result.'</div>';
+            }/*
+            else{
+                $result.='';
+            }*/
+           //krumo($result);
+           $out=$result;
+        }
+        elseif($url['host']=='water.discomap.eea.europa.eu'){
+            if($params['LAYER']=='4' && strpos($url['path'], 'BathingWater')>0){
+                $result = '<div class="legend-label">'.t('Bathing water').'</div><div  class="legend-img">'.$result.'</div>';
+            }
+            elseif($params['LAYER']=='1' && strpos($url['path'], 'NitrateRivers') > 0){
+                $result = '<div class="legend-label">'.t('Mean annual nitrates in rivers by station').'</div><div  class="legend-img">'.$result.'</div>';
+            }
+            elseif($params['LAYER']=='3' && strpos($url['path'], 'OrthophosphateRivers') > 0){
+                $result = '<div class="legend-label">'.t('Mean annual orthophosphate in rivers by station').'</div><div  class="legend-img">'.$result.'</div>';
+            }
+            elseif($params['LAYER']=='1' && strpos($url['path'], 'BODRivers') > 0){
+                $result = '<div class="legend-label">'.t('Mean annual BOD in rivers by station').'</div><div  class="legend-img">'.$result.'</div>';
+            }
+            elseif($params['LAYER']=='1' && strpos($url['path'], 'AmmoniumRivers') > 0){
+                $result = '<div class="legend-label">'.t('Mean annual Ammonium in rivers by station').'</div><div  class="legend-img">'.$result.'</div>';
+            }
+
+            elseif($params['LAYER']=='3' && strpos($url['path'], 'MonitoringStations') > 0){
+                $result = '<div class="legend-label">'.t('SoE Monitoring Station').'</div><div  class="legend-img">'.$result.'</div>';
+            }
+            else{
+                //krumo($url);
+                $result ='';
+            }
+        }
+    }
+    $url["processed"] = true;
+}
+//hook_wms_getfeatureinfo_alter
+function uwwtd_wms_getfeatureinfo_alter(&$result, &$url){
+    //Uncomment for debug
+    foreach($result as $layer=>$features){
+        //Natura 2000
+        
+        if($url['host']=='bio.discomap.eea.europa.eu'){           
+            if($layer=='0'){
+                $new_layer = t('Natura 2000');
+                /*
+                print "<pre>";
+                print_r($features);
+                print "</pre>";
+                */
+                $data =array();
+                $keys = array('SITECODE','SITENAME','MS','SITETYPE', 'RELEASE_DATE');
+                foreach($features as $feature){
+                    $line = array_intersect_key($feature, array_flip($keys));
+                    $line['SITECODE']  = '<a target="_blank" href="http://natura2000.eea.europa.eu/Natura2000/SDF.aspx?site='.$line['SITECODE'].'">'.$line['SITECODE'].'</a>';
+                    if($line['SITETYPE']=='A'){
+                        $line['SITETYPE']  ='Habitats Directive Sites (pSCI, SCI or SAC) ['.$line['SITETYPE'].']';
+                    }
+                    elseif($line['SITETYPE']=='B'){
+                        $line['SITETYPE']  ='Birds Directive Sites (SPA) ['.$line['SITETYPE'].']';
+                    }
+                    else {$line['SITETYPE']  =$line['SITETYPE'];}
+                    $data[] = $line;
+                }
+                $result[$new_layer] = $data;
+                unset($result[$layer]);
+            }
+            elseif(is_numeric($layer)){
+                unset($result[$layer]);
+            }
+        }
+
+        elseif($url['host']=='water.discomap.eea.europa.eu'){
+            //Bathing water : level 4
+            if($layer=='4'  && strpos($url['path'], 'BathingWater')>0){
+                $new_layer = t('Bathing water');
+                $data =array();
+                $keys = array('Bathingwatername','Country', 'Watertype', '2012', '2013', '2014', '2015', '2016', '2017', '2018','Linktobathingwaterprofile');
+                foreach($features as $feature){
+                    $item = array_intersect_key($feature, array_flip($keys));
+                    if(isset($item['Linktobathingwaterprofile']) && $item['Linktobathingwaterprofile']!=''){
+                        $item['Linktobathingwaterprofile'] = l("More information", $item['Linktobathingwaterprofile'], array('attributes'=>array('target'=>'_blank')));
+                    }
+                    $data[] = $item;
+                }
+                $result[$new_layer] = $data;
+                unset($result[$layer]);
+            }
+            elseif($layer=='3' && strpos($url['path'], 'MonitoringStations')>0){
+                $new_layer =t("SoE Monitoring Stations");
+                $keys = array("WaterCategory","CountryCode","CountryName","Waterbase_StationID","NationalStationID","NationalStationName","WFD_EU_CD","River_Lake_SeaRegion_Name","Surface_Ground_WaterBodyID","Surface_Ground_WaterBodyName","RBDcode","RBDname","RecordReported","Remarks");
+                foreach($features as $feature){
+                    $data[] = array_intersect_key($feature, array_flip($keys));
+                }
+                $result[$new_layer] = $data;
+                unset($result[$layer]);
+            }
+            elseif($layer=='1' && strpos($url['path'], 'NitrateRivers') > 0){
+                $new_layer = t('Mean annual nitrates in rivers by station');
+                $result[$new_layer] = uwwtd_wms_preprocess_soe_data($features);
+                unset($result[$layer]);
+            }
+            elseif($layer=='1' && strpos($url['path'], 'OrthophosphateRivers') > 0){
+                $new_layer = t('Mean annual orthophosphate in rivers by station');
+                $result[$new_layer] = uwwtd_wms_preprocess_soe_data($features);
+                unset($result[$layer]);
+            }
+            elseif($layer=='1' && strpos($url['path'], 'BODRivers') > 0){
+                $new_layer = t('Mean annual BOD in rivers by station');
+                $result[$new_layer] = uwwtd_wms_preprocess_soe_data($features);
+                unset($result[$layer]);
+            }
+            elseif($layer=='1' && strpos($url['path'], 'AmmoniumRivers') > 0){
+                $new_layer = t('Mean annual Ammonium in rivers by station');
+                $result[$new_layer] = uwwtd_wms_preprocess_soe_data($features);
+                unset($result[$layer]);
+            }
+            //Other layers/levels
+            elseif(is_numeric($layer)){
+                unset($result[$layer]);
+            }
+        }
+        elseif($url['host']=='maps.oieau.fr'){
+            //NUTS
+
+            if(substr($layer, 0,4)=='NUTS'){
+                $new_layer = t('Nomenclature des Unités Territoriales Statistiques (NUTS)').' '.t('level').' '.substr($layer, -1);
+                foreach($features as $feature){
+                    $item = array(
+                        "NUTS ID"=>$feature['NUTS_ID'],
+                        "Level"=>$feature['STAT_LEVL_']
+                    );
+                    $data[] = $item;
+                }
+                $result[$new_layer] = $data;
+                unset($result[$layer]);
+            }
+            elseif($layer=='RBD'){
+                $new_layer =t("River Basin Districts (RBD)");
+                $keys = array("C_CD","EURBDCode","RBD_MS_CD","EUCD_RBD","RBDName","RBDNameNL","Internatio");
+                foreach($features as $feature){
+                    $data[] = array_intersect_key($feature, array_flip($keys));
+                }
+                $result[$new_layer] = $data;
+                unset($result[$layer]);
+            }
+            elseif($layer=='RBDSU'){
+                $new_layer =t("River Basin Districts Subunits (RBDSU)");
+                $keys = array("C_CD","EURBDCode","RBD_MS_CD","EUCD_RBD","RBDName","RBDNameNL","EUSubUnitC","MS_SubUnit","SubUnitNam","SubUnitN_1","Internatio");
+                foreach($features as $feature){
+                    $data[] = array_intersect_key($feature, array_flip($keys));
+                }
+                $result[$new_layer] = $data;
+                unset($result[$layer]);
+            }
+        }
+    }
+}
+
+
+function uwwtd_wms_preprocess_soe_data($features){
+    $data = array();
+    if(!empty($features)){
+        foreach($features as $feature){
+            $WaterbasestationID = $feature['WaterbasestationID'];
+            $Year = (string)$feature['Year'];
+            $Meanannualconcentration = $feature['Meanannualconcentration'];
+            if(!isset($data[$WaterbasestationID])){
+                $keys = array('Country','Rivername','WaterbasestationID','Stationname', 'Longitude', 'Latitude', 'WaterBodyID','Waterbodyname','RBDcode','RBDname');
+                $data[$WaterbasestationID] = array_intersect_key($feature, array_flip($keys));;
+            }
+            $data[$WaterbasestationID]['Meanannualconcentration'][$Year] = $Year.' : '.$Meanannualconcentration.' '.$feature['Unit'];
+            /*
+            $data[$WaterbasestationID]['#data'][(integer)$Year] = array(
+                'value'=>(float)$Meanannualconcentration,
+                'valueformat'=>$Meanannualconcentration.' '.$feature['Unit'],
+                'label'=>(string)$Year
+            );
+            */
+        }
+        foreach($data as $k=>$v){
+            ksort($v['Meanannualconcentration'], SORT_NUMERIC);
+            $data[$k]['Meanannualconcentration'] = theme('item_list', array('items'=>$v['Meanannualconcentration']));
+            //ksort($data[$k]['#data'], SORT_NUMERIC);
+
+            //Bad ==> change wms module for have a jsonp calling
+            /*
+            $data[$k]['#chart'] = '<script> 
+                var data = '.json_encode($data[$k]['#data']).';
+                console.log(data);
+            </script>';
+            */
+
+        }
+    }
+    return $data;
+}
+/**
+ * Crée un fichier xls avec le tableau de valeurs donnés et l'ouvre.
+ * Le tableau donné doit être un tableau à 2 dimensions, simple.
+ */
+function uwwtd_create_xls($filename, $rows) {
+	require_once(drupal_get_path('module', 'uwwtd') . '/lib/PHPExcel-1.8.1/Classes/PHPExcel.php');
+
+	// Création du excel :
+	$objPHPExcel = new PHPExcel();
+	$objPHPExcel->getProperties()->setCreator("Office International de l'Eau");
+	$objPHPExcel->setActiveSheetIndex(0);
+
+	// Création du contenu :
+	$objPHPExcel->getActiveSheet()->fromArray($rows, "", 'A1');
+
+	// Resize :
+	foreach(range('A','Z') as $columnID) {
+		$objPHPExcel->getActiveSheet()->getColumnDimension($columnID)
+		->setAutoSize(true);
+	}
+
+	// Sauvegarde du fichier :
+	$path = 'temporary://' . $filename;
+	$objWriter = PHPExcel_IOFactory::createWriter($objPHPExcel, 'Excel2007');
+	$objWriter->save(drupal_realpath($path));
+	unset($objWriter);
+
+	// Header du fichier :
+	$headers = array(
+		'Content-Type' => 'application/octet-stream',
+		'Content-Transfer-Encoding' => 'binary',
+		'Content-Disposition' => 'attachment; filename="' . basename($path) . '";',
+		'Content-Length' => sprintf('%u', filesize($path)),
+	);
+
+	// Envoie en téléchargement :
+	file_transfer($path, $headers);
+}
+
+
+
+function uwwtd_check_history($localid, $annee, $type=null){
+  //Get all the nodes with the same id
+  //nd@oieau.fr 13/11/2018: In 2016, Greece have change his country code from "gr" to "el".
+  $query = db_select('field_data_field_inspireidlocalid', 'n');
+  $query->fields('n', array('entity_id'));
+  //Greek case
+  if(in_array(strtolower(variable_get('siif_eru_country_code')), ['gr', 'el'])){
+    $localids=[$localid];
+    $localids[]=str_replace('EL', 'GR',$localid);
+    $localids[]=str_replace('GR', 'EL',$localid);
+    $query->condition('n.field_inspireidlocalid_value', $localids, 'IN'); 
+  }
+  else{
+    $query->condition('n.field_inspireidlocalid_value', $localid, '=');  
+  }
+  
+  if(!is_null($type) && $type!=''){
+    $query->condition('n.bundle', $type, '=');    
+  }
+  
+  $ids = array();
+  $results = $query->execute();
+  foreach($results as $result){
+    $node = node_load($result->entity_id);
+    $ids[] = $node->nid;
+  }
+
+  if(count($ids) == 0) return false;
+  else return $ids;
+}
+
+function uwwtd_timeline_output($node, $linkOnAllYears=false){
+  $output = '';
+  $histories = uwwtd_check_history($node->field_inspireidlocalid['und'][0]['value'], $node->field_anneedata['und'][0]['value'], $node->type);
+  if($histories != false){
+    $otherList = array();
+    $output .= '<div class="uwwtd-history">';
+
+//     $output .= '<fieldset class="uwwtd-history field-group-fieldset panel panel-default form-wrapper">
+//     <legend class="panel-heading">
+//     <div class="panel-title fieldset-legend">'.t('Compliance timeline').'</div>
+//     </legend>';
+    
+
+    foreach($histories as $history){  
+
+      $other = node_load($history);
+      if ($other->type == 'uwwtp' || $other->type == 'agglomeration') {
+        $otherY = $other->field_anneedata['und'][0]['value'];
+        $otherList[$otherY] = array('node'=>$other);
+      } 
+    }
+    ksort($otherList);
+    $output .='<table class = "dispo-annee">
+              <tbody>
+                <tr>
+                  <td class="dispo-before"><div></div></td>';
+    foreach($otherList as $other){
+      $ting = $other['node'];
+      if($node->type == 'agglomeration') $val = $ting->field_aggcompliance['und'][0]['value'];
+      if($node->type == 'uwwtp') $val = $ting->field_uwwcompliance['und'][0]['value'];
+            //override PD and QC value, we don't want to display QC and PD (for now)
+            if (isset($val) && isset($GLOBALS['uwwtd']['ui']['compliance_connection'][ $val ])) {
+                $val = $GLOBALS['uwwtd']['ui']['compliance_connection'][ $val ];
+            }
+
+      //default colors
+      $color = '#6b6b6b'; $borderc = '#6b5e66';
+
+      if(isset($val)){
+        if($val == 'C') {$color = '#4f91e1'; $borderc = '#4faaf9'; $txtc = '#ffffff'; $bulleTxt = t('Compliant'); $dispo =1;}
+        elseif($val == 'NC') {$color = '#d93c3c'; $borderc = '#d91a10'; $txtc = '#ffffff'; $bulleTxt = t('Not compliant');$dispo =2;}
+        elseif($val == 'NR') {$color = '#a2a2a2'; $borderc = '#a6a2a2'; $txtc = '#ffffff'; $bulleTxt = t('Not relevant');$dispo =3;}
+        elseif($val == 'NI') {$color = '#6b6b6b'; $borderc = '#6b5e66'; $txtc = '#ffffff'; $bulleTxt = t('No information'); $dispo =4;}
+        // if($val == 'CE') {$color = '#ea8b2e'; $borderc = '#ea7810'; $txtc = '#ffffff'; $bulleTxt = t('Compliant on equipment');$dispo =5;}
+        else{$color = '#6b6b6b'; $borderc = '#6b5e66'; $txtc = '#ffffff'; $bulleTxt = t('?');$dispo =0;}
+      }
+      else{$color = '#6b6b6b'; $borderc = '#6b5e66'; $txtc = '#ffffff'; $bulleTxt = t('?');$dispo =0;}
+      // $color = uwwtd_adjustBrightness($color, 50);
+      $nbAnnee = count($otherY); 
+      $j=0;
+            $cell = 0;
+      for($a=1;$a<=$nbAnnee;$a++){
+        if($ting->field_anneedata['und'][0]['value'] == $node->field_anneedata['und'][0]['value'] && !$linkOnAllYears){
+              $output.='<td class="dispo-annee dispo-'.$dispo.' uwwtd-history-element uwwtd-history-element-current">';
+            $output .= '<h4 style="color: '.$txtc.';" title="'.$bulleTxt.'">'.$ting->field_anneedata['und'][0]['value'].'</h4>';
+            // if(isset($val)) $output .= '<span class="current" style="background-color: '.$color.'; border-color: '.$borderc.'; color: '.$txtc.'" title="'.$bulleTxt.'">'.$bulleTxt.'</span>';
+          $output .= '</td>';
+        }else{
+          $output.='<td class="dispo-annee dispo-'.$dispo.' uwwtd-history-element">';
+            $output .= '<h4 style="color: '.$txtc.';" title="'.$bulleTxt.'">'.l($ting->field_anneedata['und'][0]['value'], 'node/'.$ting->nid).'</h4>';
+            // if(isset($val)) $output .= '<span style="background-color: '.$color.'; border-color: '.$borderc.'; color: '.$txtc.'" title="'.$bulleTxt.'">'.$val.'</span>';
+          $output .= '</td>';
+        }
+                //Si on arrive a 16 cellules, un retour à la ligne s'impose
+                if($cell==16){
+                    $output.='<td class="dispo-next">...</td></tr><tr><td class="dispo-next">...</td>';
+                    $cell=0;
+                }
+                else{
+                    $cell++;
+                }
+                $j++;
+            }
+
+      // if($ting->field_anneedata['und'][0]['value'] == $node->field_anneedata['und'][0]['value']){
+        // $output .= '<div class="uwwtd-history-element uwwtd-history-element-current">';
+        // $output .= '<h4>'.$ting->field_anneedata['und'][0]['value'].'</h4>';
+        // if(isset($val)) $output .= '<span class="current" style="background-color: '.$color.'; border-color: '.$borderc.'; color: '.$txtc.'" title="'.$bulleTxt.'">'.$bulleTxt.'</span>';
+        // $output .= '</div>';
+      // }
+      // else{
+        // $output .= '<div class="uwwtd-history-element">';
+        // $output .= '<h4>'.l($ting->field_anneedata['und'][0]['value'], 'node/'.$ting->nid).'</h4>';
+        // if(isset($val)) $output .= '<span style="background-color: '.$color.'; border-color: '.$borderc.'; color: '.$txtc.'" title="'.$bulleTxt.'">'.$val.'</span>';
+        // $output .= '</div>';
+      // }
+    }
+      $output.='<td class="dispo-after"><div></div></td>';
+      if($node->type == 'agglomeration'){
+          $output.='<td class="history-link">'.l('View history', 'agglomeration/'.str_replace('_', '', strtolower($node->field_inspireidlocalid['und'][0]['value'])).'/history', ['attributes'=>['target'=>'_blank']]).'</td>';
+       }elseif($node->type == 'uwwtp'){
+          $output.='<td class="history-link">'.l('View history', 'treatment-plant/'.str_replace('_', '', strtolower($node->field_inspireidlocalid['und'][0]['value'])).'/history', ['attributes'=>['target'=>'_blank']]).'</td>';
+       }
+      
+          $output.='</tr>';
+        $output.='</table>';
+    $output.='<div class="dispo-legend">';
+          $output.='<div class="dispo-legend-item"><div class="dispo-legend-color dispo-1">&nbsp;</div><div class="dispo-legend-label"> '.t('Compliant').'</div></div>';
+          $output.='<div class="dispo-legend-item"><div class="dispo-legend-color dispo-2">&nbsp;</div><div class="dispo-legend-label"> '.t('Not compliant').'</div></div>';
+          $output.='<div class="dispo-legend-item"><div class="dispo-legend-color dispo-3">&nbsp;</div><div class="dispo-legend-label"> '.t('Not relevant').'</div></div>';
+          $output.='<div class="dispo-legend-item"><div class="dispo-legend-color dispo-4">&nbsp;</div><div class="dispo-legend-label"> '.t('No information').'</div></div>';
+          // $output.='<div class="dispo-legend-item"><div class="dispo-legend-color dispo-5">&nbsp;</div><div class="dispo-legend-label"> '.t('Compliant on equipment').'</div></div>';
+          $output.='<div class="dispo-legend-item"><div class="dispo-legend-color dispo-0">&nbsp;</div><div class="dispo-legend-label"> '.t('?').'</div></div>';
+          $output.='<br class="spacer"/>';
+        $output.='</div>';
+//     $output .= '</fieldset>
+//                 </div><br>';
+    $output .= '</div><br>';
+  }
+
+  return $output;
+}
+
+function uwwtd_timeline_receiving_area_output($node){
+  $output = '';
+  $histories = uwwtd_check_history($node->field_inspireidlocalid['und'][0]['value'], $node->field_anneedata['und'][0]['value']);
+  if($histories != false){
+    $otherList = array();
+    $output .= '<div class="uwwtd-history">';
+    $output .= '<fieldset class="uwwtd-history field-group-fieldset panel panel-default form-wrapper">
+    <legend class="panel-heading">
+    <div class="panel-title fieldset-legend">'.t('Timeline').'</div>
+    </legend>';
+    foreach($histories as $history){
+      $other = node_load($history);
+      $otherY = $other->field_anneedata['und'][0]['value'];
+      $otherList[$otherY] = array('node'=>$other);
+    }
+    ksort($otherList);
+    // dsm($otherList);
+    $output .='<table class = "dispo-annee receiving-area">
+              <tbody>
+                <tr>
+                  <td class="dispo-before"><div></div></td>';
+    foreach($otherList as $other){
+      $ting = $other['node'];
+   //    if ($ting->type == 'receiving_area') {
+        
+   //    }
+      // if($node->type == 'agglomeration') $val = $ting->field_aggcompliance['und'][0]['value'];
+      // if($node->type == 'uwwtp') $val = $ting->field_uwwcompliance['und'][0]['value'];
+
+      // //override PD and QC value, we don't want to display QC and PD (for now)
+      // if (isset($val) && isset($GLOBALS['uwwtd']['ui']['compliance_connection'][ $val ])) {
+      //  $val = $GLOBALS['uwwtd']['ui']['compliance_connection'][ $val ];
+      // }
+
+      // //default colors
+      // $color = '#6b6b6b'; $borderc = '#6b5e66';
+
+      // if(isset($val)){
+      //  if($val == 'C') {$color = '#4f91e1'; $borderc = '#4faaf9'; $txtc = '#ffffff'; $bulleTxt = t('Compliant'); $dispo =1;}
+      //  if($val == 'NC') {$color = '#d93c3c'; $borderc = '#d91a10'; $txtc = '#ffffff'; $bulleTxt = t('Not compliant');$dispo =2;}
+      //  if($val == 'NR') {$color = '#a2a2a2'; $borderc = '#a6a2a2'; $txtc = '#ffffff'; $bulleTxt = t('Not relevant');$dispo =3;}
+      //  if($val == 'NI') {$color = '#6b6b6b'; $borderc = '#6b5e66'; $txtc = '#ffffff'; $bulleTxt = t('No information'); $dispo =4;}
+      //  // if($val == 'CE') {$color = '#ea8b2e'; $borderc = '#ea7810'; $txtc = '#ffffff'; $bulleTxt = t('Compliant on equipment');$dispo =5;}
+      //  if($val == '?') {$color = '#6b6b6b'; $borderc = '#6b5e66'; $txtc = '#ffffff'; $bulleTxt = t('?');$dispo =0;}
+      // }
+      // $color = uwwtd_adjustBrightness($color, 50);
+      $nbAnnee = count($otherY);
+      $j=0;
+      $cell = 0;
+      for($a=1;$a<=$nbAnnee;$a++){
+        if($ting->field_anneedata['und'][0]['value'] == $node->field_anneedata['und'][0]['value']){
+          $output.='<td class="dispo-annee uwwtd-history-element uwwtd-history-element-current">';
+          $output .= '<h4 style="color: #000;">'.$ting->field_anneedata['und'][0]['value'].'</h4>';
+          // if(isset($val)) $output .= '<span class="current" style="background-color: '.$color.'; border-color: '.$borderc.'; color: '.$txtc.'" title="'.$bulleTxt.'">'.$bulleTxt.'</span>';
+          $output .= '</td>';
+        }else{
+          $output.='<td class="dispo-annee uwwtd-history-element">';
+          $output .= '<h4 style="color: #000;">'.l($ting->field_anneedata['und'][0]['value'], 'node/'.$ting->nid, array('attributes' => array('style' => 'color: #000 !important'))).'</h4>';
+          // if(isset($val)) $output .= '<span style="background-color: '.$color.'; border-color: '.$borderc.'; color: '.$txtc.'" title="'.$bulleTxt.'">'.$val.'</span>';
+          $output .= '</td>';
+        }
+        //Si on arrive a 16 cellules, un retour à la ligne s'impose
+        if($cell==16){
+          $output.='<td class="dispo-next">...</td></tr><tr><td class="dispo-next">...</td>';
+          $cell=0;
+        }
+        else{
+          $cell++;
+        }
+        $j++;
+      }
+    }
+    $output.='<td class="dispo-after"><div></div></td>';
+    $output.='</tr>';
+    $output.='</table>';
+    $output .= '</fieldset></div>';
+  }
+
+  return $output;
+}
+
+
+/**
+ * Return DQL query to get datas ensitive areas.
+ */
+function uwwtd_get_query_data_sensitive_areas($isWithNid = FALSE) {
+    $sqlWithNid = '';
+    if ($isWithNid) {
+        $sqlWithNid = ' AND n.nid = :nid ';
+    }
+    return '
+        SELECT 
+            n.nid,
+            n.title,
+            f_annee.field_anneedata_value,
+            id.field_inspireidlocalid_value,
+            zt.field_specialisedzonetype_value as zonetype,
+            rca52.field_rca52applied_value as rca52,
+            rca54.field_rca54applied_value as rca54,
+            rca58.field_rca58applied_value as rca58,
+            
+            an.field_rcaanstartdate_value as dt_an,
+            ap.field_rcaapstartdate_value as dt_ap,
+            b.field_rcabstartdate_value as dt_b,
+            c.field_rcacstardate_value as dt_c,
+            art58.field_rcadateart5854_value as dt_art58,
+            
+            st_astext(st_transform(f_geo.the_geom, 4326)) wkt,
+            st_area(st_transform(f_geo.the_geom, 3035)) area,
+            COUNT(uwwtp.field_linked_treatment_plants_nid) as uwwtps,
+            SUM(capa.field_physicalcapacityactivity_value) as tot_design_capacity,
+            SUM(entering.field_uwwloadenteringuwwtp_value ) as tot_entering_load
+        FROM {node} n
+        LEFT join
+            {field_data_field_anneedata} f_annee
+                ON n.nid = f_annee.entity_id
+        LEFT join
+            {field_data_field_inspireidlocalid} id
+                ON n.nid = id.entity_id
+        LEFT join
+            {field_data_field_specialisedzonetype} zt
+                ON n.nid = zt.entity_id
+        LEFT join
+            {field_data_field_rca52applied} rca52
+                ON n.nid = rca52.entity_id
+        LEFT join
+            {field_data_field_rca54applied} rca54
+                ON n.nid = rca54.entity_id
+        LEFT join
+            {field_data_field_rca58applied} rca58
+                ON n.nid = rca58.entity_id
+        LEFT join
+                    {field_data_field_rcaanstartdate} an
+                        ON n.nid = an.entity_id
+        LEFT join
+                    {field_data_field_rcaapstartdate} ap
+                        ON n.nid = ap.entity_id
+        LEFT join
+                    {field_data_field_rcabstartdate} b
+                        ON n.nid = b.entity_id
+        LEFT join
+                    {field_data_field_rcacstardate} c
+                        ON n.nid = c.entity_id
+        LEFT join
+                    {field_data_field_rcadateart5854} art58
+                        ON n.nid = art58.entity_id        
+        LEFT JOIN 
+            {field_data_field_position_geo} f_geo 
+                ON n.nid = f_geo.entity_id
+        LEFT join
+            {field_data_field_linked_treatment_plants} uwwtp
+                ON n.nid = uwwtp.entity_id
+        LEFT JOIN  {field_data_field_status} uwwtp_status
+            ON uwwtp.field_linked_treatment_plants_nid = uwwtp_status.entity_id
+        LEFT join
+            {field_data_field_physicalcapacityactivity} capa
+                ON uwwtp.field_linked_treatment_plants_nid = capa.entity_id
+        LEFT join
+            {field_data_field_uwwloadenteringuwwtp} entering
+                ON uwwtp.field_linked_treatment_plants_nid = entering.entity_id
+              
+        WHERE n.type = :typenode
+            AND f_annee.field_anneedata_value = :annee ' . $sqlWithNid . '
+            AND uwwtp_status.field_status_value = \'1\'
+        GROUP BY 
+            n.nid,
+            n.title,
+            f_annee.field_anneedata_value,
+            id.field_inspireidlocalid_value,
+            zt.field_specialisedzonetype_value,
+            rca52.field_rca52applied_value,
+            rca54.field_rca54applied_value,
+            rca58.field_rca58applied_value,
+            an.field_rcaanstartdate_value,
+            ap.field_rcaapstartdate_value,
+            b.field_rcabstartdate_value,
+            c.field_rcacstardate_value,
+            art58.field_rcadateart5854_value,
+            f_geo.the_geom
+        ORDER BY n.title
+    ';
+}
+
+/**
+ *  Hook_field_extra_fields
+ */
+function uwwtd_field_extra_fields() { 
+  /**
+   * AGGLOMERATION
+   */
+  $extra['node']['agglomeration']['display'] = array(
+     'virtual_field_error' =>    array(
+            'label'       => t('Error list'),
+            'label_hidden'       => true,
+            'description' => t("description"),
+            'weight'      => 100,
+        ),
+     'virtual_field_map' =>    array(
+            'label'       => t('Map'),
+            'label_hidden'       => true,
+            'description' => t("Agglomeration view on a map with some info"),
+            'weight'      => 100,
+        ),
+     'virtual_compliance_time_line' =>    array(
+            'label'       => t('compliance Time Line'), 
+            'label_hidden'       => true,
+            'description' => t("List of all the year available for the agglomeration"),
+            'weight'      => 100,
+        ),
+     'virtual_field_aggc1_with_pe' =>    array(
+            'label'       => t('Connected to collecting system'),
+            'description' => t("description"),
+            'weight'      => 100,
+        ),
+     'virtual_field_aggc2_with_pe' =>    array(
+            'label'       => t('Individual or Appropriate Systems (IAS)'),
+            'description' => t("description"),
+            'weight'      => 100,
+        ),
+     'virtual_field_aggpercwithouttreatment_with_pe' =>    array(
+            'label'       => t('Discharged without treatment'),
+            'description' => t("description"),
+            'weight'      => 100,
+        ),
+     'virtual_field_piechart_agglonode' =>    array(
+            'label'       => t('Piechart'),
+            'label_hidden'       => true,
+            'description' => t("description"),
+            'weight'      => 100,
+        ),
+     'virtual_field_aggart4compliance_hierarchical' =>    array(
+            'label'       => t('2nd treatment compliance'),
+            'description' => t("description"),
+            'weight'      => 100,
+        ),
+     'virtual_field_aggart5compliance_hierarchical' =>    array(
+            'label'       => t('3rd treatment compliance'),
+            'description' => t("description"),
+            'weight'      => 100,
+        ),
+     'virtual_field_table_distance_to_compliance' =>    array(
+            'label'       => t('Table of the distance to target'), 
+            'label_hidden'       => true,
+            'description' => t("description"),
+            'weight'      => 100,
+        ),
+     'virtual_graphic' =>    array(
+            'label'       => t('Graphical network summary'),
+            'label_hidden'       => true,
+            'description' => t("description"),
+            'weight'      => 100,
+        ),
+     'virtual_field_latitude_custom' =>    array(
+            'label'       => t('Latitude'),
+            'label_hidden'       => true,
+            'description' => t("description"),
+            'weight'      => 100,
+        ),
+     'virtual_field_longitude_custom' =>    array(
+            'label'       => t('Longitude'),
+            'label_hidden'       => true,
+            'description' => t("description"),
+            'weight'      => 100,
+        ),
+     'virtual_field_aggperiodover5_custom' =>    array(
+            'label'       => t('Deadline 3rd treatment compliance'),
+            'description' => t("when agggenerated < 10000 set to Nor Relevant"),
+            'weight'      => 100,
+        ),
+     'virtual_field_source_file_link' =>    array(
+            'label'       => t('List of data source file'),
+            'label_hidden'       => true,
+            'description' => t("description"),
+            'weight'      => 100,
+        ),
+     'virtual_field_article_17' =>    array(
+            'label'       => t('Article 17 field'),
+            'label_hidden'       => true,
+            'description' => t("description"),
+            'weight'      => 100,
+        ),
+  );
+
+  /**
+   * UWWTP
+   */
+  $extra['node']['uwwtp']['display'] = array(
+     'virtual_field_error' =>    array(
+            'label'       => t('Error list'),
+            'label_hidden'       => true,
+            'description' => t("description"),
+            'weight'      => 100,
+        ),
+     'virtual_field_map' =>    array(
+            'label'       => t('Map'),
+            'label_hidden'       => true,
+            'description' => t("Agglomeration view on a map with some info"),
+            'weight'      => 100,
+        ),
+     'virtual_compliance_time_line' =>    array(
+            'label'       => t('compliance Time Line'), 
+            'label_hidden'       => true,
+            'description' => t("List of all the year available for the agglomeration"),
+            'weight'      => 100,
+        ),
+     'virtual_field_data_stackedbar' =>    array(
+            'label'       => t('Data Stacked bar'),
+            'label_hidden'       => true,
+            'description' => t("description"),
+            'weight'      => 100,
+        ),
+     'virtual_field_stackedbar_uwwtpnode' =>    array(
+            'label'       => t('Stacked bar'),
+            'label_hidden'       => true,
+            'description' => t("description"),
+            'weight'      => 100,
+        ),
+     'virtual_graphic' =>    array(
+            'label'       => t('Graphical network summary'),
+            'label_hidden'       => true,
+            'description' => t("description"),
+            'weight'      => 100,
+        ),
+     'virtual_field_latitude_custom' =>    array(
+            'label'       => t('Latitude'),
+            'label_hidden'       => true,
+            'description' => t("description"),
+            'weight'      => 100,
+        ),
+     'virtual_field_longitude_custom' =>    array(
+            'label'       => t('Longitude'),
+            'label_hidden'       => true,
+            'description' => t("description"),
+            'weight'      => 100,
+        ),
+     'virtual_field_source_file_link' =>    array(
+            'label'       => t('List of data source file'),
+            'label_hidden'       => true,
+            'description' => t("description"),
+            'weight'      => 100,
+        ),
+     'virtual_field_article_17' =>    array(
+            'label'       => t('Article 17 field'),
+            'label_hidden'       => true,
+            'description' => t("description"),
+            'weight'      => 100,
+        ),
+  );
+
+  /**
+   * DCP
+   */
+  $extra['node']['discharge_point']['display'] = array(
+     'virtual_field_error' =>    array(
+            'label'       => t('Error list'),
+            'label_hidden'       => true,
+            'description' => t("description"),
+            'weight'      => 100,
+        ),    
+     'virtual_field_map' =>    array(
+            'label'       => t('Map'),
+            'label_hidden'       => true,
+            'description' => t("Agglomeration view on a map with some info"),
+            'weight'      => 100,
+        ),
+     'virtual_field_latitude_custom' =>    array(
+            'label'       => t('Latitude'),
+            'label_hidden'       => true,
+            'description' => t("description"),
+            'weight'      => 100,
+        ),
+     'virtual_field_longitude_custom' =>    array(
+            'label'       => t('Longitude'),
+            'label_hidden'       => true,
+            'description' => t("description"),
+            'weight'      => 100,
+        ),
+     'virtual_field_source_file_link' =>    array(
+            'label'       => t('List of data source file'),
+            'label_hidden'       => true,
+            'description' => t("description"),
+            'weight'      => 100,
+        ),
+  );
+
+  return $extra;
+}
+
+/**
+ *
+ */
+function uwwtd_node_view($node, $view_mode, $langcode) {
+  require_once(drupal_get_path('module', 'uwwtd') . '/inc/field.inc');
+
+  $extra = uwwtd_field_extra_fields();
+  
+//   static $test = null;
+//   if (!isset($test)) {
+//     $test = true;
+//     dsm(array_keys($node->content));
+// //     dsm($node->content['field_aggart6compliance']);
+//     dsm(array_keys($node->content['field_agggenerated']));
+//     dsm($node->content['field_agggenerated']['#theme']);
+//     dsm($node->content['field_agggenerated']['#title']);
+//     dsm($node->content['field_agggenerated']['#label_display']);
+//     dsm($node->content['field_agggenerated']['#weight']);
+//     dsm($node->content['field_agggenerated']['#field_type']);
+//     dsm($node->content['field_agggenerated']['#field_name']);
+//     dsm($node->content['field_agggenerated']['#bundle']);
+//     dsm($node->content['field_agggenerated']['#entity_type']);
+//     dsm($node->content['field_agggenerated']['#view_mode']);
+//     dsm($node->content['field_agggenerated']['#language']);
+//     dsm($node->content['field_agggenerated']['#formatter']);
+//     dsm($node->content['field_agggenerated']['#items']);
+//   }
+//   dsm(__FUNCTION__);
+//   dsm($view_mode);
+//   dsm($node->type);
+//   dsm($extra);
+
+   // Check that we're supporting the node type being viewed.
+  if (empty($extra['node'][$node->type]['display'])) {
+    return;
+  }
+
+  $config = field_bundle_settings('node', $node->type);
+//   dsm($config);
+//   dsm($extra);
+  foreach ($extra['node'][$node->type]['display'] as $field_name => $field_info) {
+//     dsm($field_name);
+    // Check to make sure this field is visible in this view mode.
+    if (empty($config['extra_fields']['display'][$field_name]['default']['visible'])) {
+//       dsm('continue');
+      continue;
+    }
+
+    $function = 'uwwtd_' . $field_name;
+    $value = $function($node, $view_mode);
+    if($value!='') {
+        $element = array(
+          '#title' => $field_info['label'],
+          '#label_display' => 'inline',  //hidden above inline
+          '#description' => $field_info['description'],  //hidden above inline
+          '#field_type' => 'text',
+          '#field_name' => $field_name,
+          'type_node' => $node->type,
+          '#items' => array(
+               0 => array('value' => $value),
+           ),
+           0 => array('#markup' => $value),
+    //        'classes_array' => array($field_name, 'custom_tooltip_wrapper'),
+        );
+
+        if (isset($field_info['label_hidden']) && true === $field_info['label_hidden']) {
+          $element['#label_display'] = 'hidden';
+        }
+        $variables['element'] = $element;
+        $node->content[$field_name]['#markup'] = theme('field', $variables);
+    }
+  }
+}
+
+
+
+
+
+/**
+ *
+ */
+/**
+ * Implements hook_form_field_ui_display_overview_form_alter().
+ */
+function uwwtd_form_field_ui_display_overview_form_alter(&$form, &$form_state) {
+//   static $test = null;
+//   if (!isset($test)) {
+//     $test = true;
+//     dsm(array_keys($form));
+//   }
+// Load the extra fields from hook_field_extra_fields() for the example module.
+//   $extra = uwwtd_field_extra_fields();
+// 
+//   // If the fields are not supported for the entity type and bundle we're loading the form for
+//   // then return early.
+//   if (!isset($extra[$form['#entity_type']], $extra[$form['#entity_type']][$form['#bundle']])) {
+//     return;
+//   }
+// 
+//   // Filter extra fields by those the field ui module is chosing to show in the form.
+//   $extra_fields = array_keys($extra[$form['#entity_type']][$form['#bundle']]['display']);
+//   $extra_fields = array_intersect($extra_fields, $form['#extra']);
+// 
+//   if (empty($extra_fields)) {
+//     return;
+//   }
+// 
+//   foreach ($extra_fields as $field_name) {
+//     $form['fields'][$field_name]['settings_edit'] = array(
+//       '#type' => 'textfield',
+//       '#default_value' => t('example text field as a configuration option.'),
+//     );
+//     $form['fields'][$field_name]['settings_summary']['#markup'] = 'This is the settings summary.';
+//   }
+//   // Don't forget to add a submit handler if you need to process/save 
+//   // configuration for your fields.
+//   // $form['#submit'][] = 'example_form_field_ui_display_overview_form_submit';
+
+}
+
+function uwwtd_create_config_file_display() {
+
+
+  $bundle_list = array(
+    'agglomeration',
+    'uwwtp',
+    'discharge_point',
+  );
+
+  foreach($bundle_list as $bundle) {
+    //export all group
+    $groups = field_group_info_groups('node', $bundle);
+    //dsm($groups);
+    file_put_contents(drupal_get_path('module', 'uwwtd') . '/script/'.$bundle.'_list_group.inc', "<?php \n\n\$groups = " . str_replace('stdClass::__set_state', '(object)', var_export($groups, true)) . ';');
+
+    //export virtual field config (weight)
+    $virtual = field_bundle_settings('node', $bundle);      
+    unset($virtual['extra_fields']['display']['uwwtd_virtual_graphic']);   
+    unset($virtual['extra_fields']['display']['virtual_agglo_graphic']); 
+    //dsm($virtual);
+    file_put_contents(drupal_get_path('module', 'uwwtd') . '/script/'.$bundle.'_list_virtual.inc', "<?php \n\n\$virtual = " . var_export($virtual, true) . ';'); 
+
+    $fields_instance  = field_info_instances('node', $bundle);
+    //dsm($fields_instance);
+    file_put_contents(drupal_get_path('module', 'uwwtd') . '/script/'.$bundle.'_list_field.inc', "<?php \n\n\$fields_instance = " . var_export($fields_instance, true) . ';');
+
+  }
+  
+  return 'ok';
+}

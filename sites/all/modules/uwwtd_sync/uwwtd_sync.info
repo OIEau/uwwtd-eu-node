@@ -1,0 +1,6 @@
+name = UWWTD SYNC
+description = This module provide harvesting functionalities of UWWTD SIIF plateform data.
+core = 7.x
+version = 7.x-1.1
+project = uwwtd
+package = uwwtd

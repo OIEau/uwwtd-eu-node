@@ -1,0 +1,356 @@
+<?php
+/**
+ * @file
+ * Defines configuration menu/form and sections.
+ */
+
+/**
+ * Implements hook_menu().
+ */
+function uwwtd_statistics_menu() {
+  $items['uwwtd_statistics'] = array(
+    'title' => 'Statistics',
+    'page callback' => 'uwwtd_statistics_page',
+    'access callback' => true,
+    'access callback' => true,
+    'file' => 'inc/statistics_load.inc',
+    'type' => MENU_CALLBACK,
+  );
+
+  $items['uwwtd_statistics/%'] = array(
+    'title' => 'Statistics',
+    'page callback' => 'uwwtd_statistics_page',
+    'page arguments' => array(1),
+    'access callback' => true,
+    'file' => 'inc/statistics_load.inc',
+    'type' => MENU_CALLBACK,
+  );
+
+  $items['uwwtd_statistics/%/%'] = array(
+    'title' => 'Statistics',
+    'page callback' => 'uwwtd_statistics_page',
+    'page arguments' => array(1,2),
+    'access callback' => true,
+    'file' => 'inc/statistics_load.inc',
+    'type' => MENU_CALLBACK,
+  );
+
+  
+
+  return $items;
+}
+
+/**
+ * Stats render page.
+ */
+function uwwtd_statistics_page($content_type = '', $data_type = '') {
+  $form = drupal_get_form('uwwtd_statistics_form', $content_type, $data_type);
+  drupal_add_css(drupal_get_path('module', 'uwwtd_statistics').'/css/statistics.css');
+  return render($form);
+}
+
+/**
+ * Implements hook_form().
+ */
+function uwwtd_statistics_form($form, &$form_state) {
+  $form['#prefix'] = '<h1>' . t('Statistics') . '</h1>';
+  $form['description'] = array('#markup' => t('<p>Select the type of content, type of data (if needed) and geographical extent to generate the statistics.</p>'));
+  if($form_state['build_info']['args'][0] == '') {
+    $form['content_type'] = array(
+      '#type' => 'select',
+      '#title' => t('Type'),
+      '#options' => array(
+          'none' => '- Select a content type -',
+          'agglomeration' => 'Agglomerations',
+          'uwwtp' => 'Stations',
+          'discharge_point' => 'Discharge points',
+          'sensitive_area' => 'Sensitive area',
+        ),
+      '#default_value' => isset($form_state['values']['content_type']) ? $form_state['values']['content_type'] : 'none',
+    );
+  }
+
+//   if($form_state['build_info']['args'][1] == '') {
+//
+//     $form['data_type'] = array(
+//       '#title' => t('Data type'),
+//       '#type' => 'select',
+//       '#options' => array(
+//           'compliance' => 'Compliance',
+//           'treatment' => 'Treatment',
+//         ),
+//       '#default_value' => isset($form_state['values']['data_type']) ? $form_state['values']['data_type'] : 'compliance',
+//       '#states' => array(
+//         'visible' => array(
+//           ':input[name="content_type"]' => array(array('value' => 'agglomeration'), array('value' => 'uwwtp')),
+//         ),
+//       ),
+//     );
+//   }
+//   dsm($form_state);
+  if($form_state['build_info']['args'][1] == '') {
+
+    $form['data_type_agglo'] = array(
+      '#title' => t('Data type'),
+      '#type' => 'select',
+      '#options' => array(
+          'compliance' => 'Compliance',
+          'treatment' => 'Connection',
+        ),
+      '#default_value' => isset($form_state['values']['data_type_agglo']) ? $form_state['values']['data_type_agglo'] : 'compliance',
+      '#states' => array(
+        'visible' => array(
+          ':input[name="content_type"]' => array(array('value' => 'agglomeration')),
+        ),
+      ),
+    );
+    $form['data_type_uwwtp'] = array(
+      '#title' => t('Data type'),
+      '#type' => 'select',
+      '#options' => array(
+          'compliance' => 'Compliance',
+          'treatment' => 'Treatment',
+        ),
+      '#default_value' => isset($form_state['values']['data_type_uwwtp']) ? $form_state['values']['data_type_uwwtp'] : 'compliance',
+      '#states' => array(
+        'visible' => array(
+          ':input[name="content_type"]' => array(array(array('value' => 'uwwtp'))),
+        ),
+      ),
+    );
+  }
+
+  // Get available years for data
+  $query = db_select('field_data_field_anneedata', 'a');
+  $query->fields('a', array('field_anneedata_value'));
+  $query->orderBy('field_anneedata_value', 'DESC');
+  $results = $query->execute();
+  $years = array('all' => 'Show all');
+  while($record = $results->fetchAssoc()) {
+    $years[$record['field_anneedata_value']] = $record['field_anneedata_value'];
+  }
+
+  $form['year'] = array(
+    '#title' => t('Year'),
+    '#type' => 'select',
+    '#options' => $years,
+    '#default_value' => isset($form_state['values']['year']) ? $form_state['values']['year'] : 'all',
+  );
+
+  $form['groupby'] = array(
+    '#title' => t('Geographical extent'),
+    '#type' => 'select',
+    '#options' => array(
+        'none' => '- Select a geographical extent -',
+        'regions' => 'Regions (NUTS)',
+        'basin' => 'Basins',
+      ),
+    '#default_value' => isset($form_state['values']['groupby']) ? $form_state['values']['groupby'] : 'none',
+  );
+
+  $form['submit'] = array(
+    '#type' => 'submit',
+    '#attributes' => array('class' => array('btn-primary', 'btn')),
+    '#value' => t('Load statistics')
+  );
+
+  if(isset($form_state['storage']['result'])) {
+    $form['#suffix'] = '<h3>' . t('Results') . '</h3>';
+    $form['#suffix'] .= $form_state['storage']['result'];
+    drupal_add_js('(function($){$("#statsTable thead tr th").each(function(i){$("#footerTable td").eq(i).css("width", $(this).width())});})(jQuery);', array('type' => 'inline', 'scope' => 'footer'));
+  }
+
+  return $form;
+}
+
+/**
+ * Form validation.
+ */
+function uwwtd_statistics_form_validate(&$form, &$form_state) {
+  if(isset($form_state['values']['content_type']) && $form_state['values']['content_type'] == 'none') {
+    form_set_error('content_type', t('Please select a content type.'));
+  }
+  if(isset($form_state['values']['groupby']) && $form_state['values']['groupby'] == 'none') {
+    form_set_error('groupby', t('Please select a geographical extent.'));
+  }
+}
+
+/**
+ * Form submit.
+ */
+function uwwtd_statistics_form_submit(&$form, &$form_state) {
+  $datatype = '';
+//   dsm($form_state);
+  if ($form_state['values']['content_type'] == 'agglomeration') {
+    $datatype = $form_state['values']['data_type_agglo'];
+  } elseif ($form_state['values']['content_type'] == 'uwwtp') {
+    $datatype = $form_state['values']['data_type_uwwtp'];
+  }
+  $data = uwwtd_statistics_get($form_state['values']['content_type'], $datatype, $form_state['values']['year'], $form_state['values']['groupby']);
+  $form_state['rebuild'] = TRUE;
+
+  if(!is_array($data)) {
+    drupal_set_message(t($data), 'error', FALSE);
+  } elseif(empty($data)) {
+    drupal_set_message(t('No data is available for these filters.'), 'error', FALSE);
+  } else {
+    $rows = array();
+    $header = array(strtoupper($form_state['values']['groupby']) => strtoupper($form_state['values']['groupby']));
+
+    // Header
+    foreach ($data as $key => $value) {
+      foreach($value as $cle => $head) {
+        $header[$cle] = $cle;
+      }
+    }
+
+    // Rows
+    foreach ($data as $key => $value) {
+      $value = array(strtoupper($form_state['values']['groupby']) => $key) + $value;
+      $rows[] = $value;
+    }
+
+    // Check rows for empty values and sort
+    $rows_ordered = array();
+    foreach ($rows as $key => $value) {
+      $i = 0;
+      foreach ($header as $head) {
+        if(!isset($value[$head])) {
+          $rows[$key] = array_slice($rows[$key], 0, $i, true) + array($head => '') + array_slice($rows[$key], $i, NULL, true);
+        }
+        $i++;
+      }
+      foreach (array_keys($header) as $cle) {
+        $rows_ordered[$key][$cle] = $rows[$key][$cle];
+      }
+    }
+
+    $rows = $rows_ordered;
+
+    // Add total row
+    $footer = array();
+    foreach ($rows as $row) {
+      foreach ($row as $key => $value) {
+        if(is_numeric($value)) {
+          if(!isset($footer[$key])) {
+            $footer[$key] = $value;
+          } else {
+            $footer[$key] += $value;
+          }
+        } else {
+          if($key == strtoupper($form_state['values']['groupby'])) {
+            $footer[$key] = '<b>TOTAL</b>';
+          }
+        }
+      }
+    }
+
+    // Min/max/average/rate rows
+    $min = array();
+    $max = array();
+    $average = array();
+    $calc = array();
+    $rate = array();
+    foreach ($rows as $row) {
+      foreach ($row as $key => $value) {
+        if(is_numeric($value)) {
+          if(!isset($min[$key])) {
+            $min[$key] = $value;
+          } elseif($value < $min[$key]) {
+            $min[$key] = $value;
+          }
+
+          if(!isset($max[$key])) {
+            $max[$key] = $value;
+          } elseif($value > $max[$key]) {
+            $max[$key] = $value;
+          }
+
+          if(!isset($calc[$key]['total'])) {
+            $calc[$key]['total'] = $value;
+            $calc[$key]['count'] = 1;
+          } else {
+            $calc[$key]['total'] += $value;
+            $calc[$key]['count']++;
+            $average[$key] = round($calc[$key]['total'] / $calc[$key]['count'],2);
+          }
+        } else {
+          if($key == strtoupper($form_state['values']['groupby'])) {
+            $min[$key] = '<b>MIN</b>';
+            $max[$key] = '<b>MAX</b>';
+            $average[$key] = '<b>AVERAGE</b>';
+          }
+        }
+      }
+    }
+
+    $g_total = 0;
+    foreach ($calc as $tot) {
+      $g_total += $tot['total'];
+    }
+
+    foreach ($rows as $row) {
+      foreach ($row as $key => $value) {
+        if(is_numeric($value)) {
+          $rate[$key] = round(($calc[$key]['total']*100)/$g_total,2) . ' %';
+        } else {
+          if($key == strtoupper($form_state['values']['groupby'])) {
+            $rate[$key] = '<b>RATE</b>';
+          }
+        }
+      }
+    }
+
+    // Sort max, min, average and rate
+    $min_ordered = array();
+    $max_ordered = array();
+    $average_ordered = array();
+    $rate_ordered = array();
+    foreach (array_keys($header) as $key) {
+      $min_ordered[$key] = $min[$key];
+      $max_ordered[$key] = $max[$key];
+      $average_ordered[$key] = $average[$key];
+      $rate_ordered[$key] = $rate[$key];
+    }
+    $min = $min_ordered;
+    $max = $max_ordered;
+    $average = $average_ordered;
+    $rate = $rate_ordered;
+    $header = array_values($header);
+    $rows = array_merge($rows, array($footer), array($rate), array($min), array($max), array($average));
+
+    // Build table
+    $table = array(
+        'header' => $header,
+        'rows' => $rows,
+        'caption' => '',
+        'colgroups' => array(),
+        'attributes' => array('class' => 'table', 'id' => 'table_stats'),
+        'sticky' => '',
+        'empty' => '',
+      );
+
+    // Export button.
+    drupal_add_js(drupal_get_path('module', 'uwwtd_statistics') . '/js/export.js');
+    $button = '<div>Download results : <a href="#" id="btnExport">csv</a></div>';
+    $form_state['storage']['result'] = $button . theme_table($table);
+  }
+}
+
+/**
+ * Stats fetch.
+ */
+function uwwtd_statistics_get($content_type, $data_type, $year, $groupby) {
+  $function = 'uwwtd_statistics_' . $content_type . '_' . $data_type;
+  if($content_type == "discharge_point" || $content_type == "sensitive_area") {
+    $function = 'uwwtd_statistics_' . $content_type;
+  }
+
+  if(function_exists($function)) {
+    $data = $function($year, $groupby);
+    return $data;
+  } else {
+    return t('The statistics for @content_type - @data_type are not available', array('@content_type' => $content_type, '@data_type' => $data_type));
+  }
+}
+

@@ -1,0 +1,301 @@
+body {
+  background-color:#fff !important;
+}
+
+.map-page {
+  background-color:#fff;
+  border:2px solid black; 
+  width:687px;
+  margin-left:5px;
+  margin-top:25px;
+  margin-bottom:0px;
+  margin-left:5px;
+  color:#000;
+}
+
+.map-title {
+  background-color:#fff;
+  text-align: center;
+  font-weight:bold;
+  border-bottom:2px solid black;
+  padding: 3px;
+}
+
+
+
+.main-map{
+  position: relative;
+  width:686px;
+  height:930px;
+}
+
+.mini-map{
+  background-color:#fff;
+}
+
+.minimap-title{
+  background-color:#fff;
+  text-align: center;
+  font-weight: bold; 
+}
+
+div.openlayers-container-map-uwwtd-map-europe div.olControlScaleLine{
+    left:450px!important;
+}
+div.olControlScaleLineBottom{
+    display:none;
+}
+/*****************************
+ * TOP LEFT
+ */
+
+.topleft, .topleft-cc {
+  background-color:#fff;                  
+  border-right: 1px solid black;
+  border-bottom: 1px solid black;
+}
+.topleft {  
+  position: absolute;         
+  top: 0;
+  left: 0;
+}
+.topleft-cc {  
+  position: absolute;         
+  top: 10px;
+  left: 860px;
+}
+
+.topleft-inner-cc {  
+  margin-right:5px;
+  margin-bottom:5px;
+  width:232px;  
+  height:228px;
+}
+.topleft-inner {  
+  margin-right:5px;
+  margin-bottom:5px;
+  width:232px;  
+  height:228px;
+}
+
+.topleft-inner .mini-map, .topleft-cc-inner .mini-map {
+  border-right:1px solid black;
+  border-bottom:1px solid black;
+}
+
+.topleft-inner .minimap-title{
+  border-bottom:1px solid black;
+}
+.topleft-cc-inner .minimap-title{
+  border-bottom:1px solid black;
+}
+
+.acore {
+  width:101px;
+  float:left;
+
+}
+
+.madeira {
+  width:131px;
+  float:left;
+}
+
+.canariass {
+  width:232px;
+}
+
+/*****************************
+ * TOP RIGHT
+ */
+
+/*.topright-cc*/
+.topright{
+  background-color:#fff;                
+  border-left: 1px solid black;
+  border-bottom: 1px solid black;
+}
+.topright{    
+  position: absolute;
+  top: 0;
+  right: 3px;
+}
+.topright-cc{    
+  position: absolute;
+  top: 0;
+  left: 700px;
+}
+
+.topright-inne, .topright-cc-inner {  
+  margin-left:5px;
+  margin-bottom:5px;
+  width:151px;  
+  height:798px;
+  
+}
+
+.topright-inner .mini-map, .topright-cc-inner .mini-map {
+  border-left:1px solid black;
+  border-bottom:1px solid black;
+}
+
+.topright-inner .minimap-title{
+  border-bottom:1px solid black;
+}
+.topright-cc-inner .minimap-title{
+  border-bottom:1px solid black;
+}
+
+/*
+.reunion {
+  width:151px;
+
+
+}
+
+.guadeloupe {
+  width:151px;
+
+}
+
+.martinique {
+  width:151px;
+
+}
+
+.guyane {
+  width:151px;
+
+}
+*/
+
+/*****************************
+ * BOTTOM LEFT
+ */
+.bottomleft {
+  position: absolute;         
+  bottom: 0;
+  left: 0;
+  background-color:#fff; 
+    border-right: 1px solid black;
+    border-top: 1px solid black;    
+}
+.bottomleft-cc {
+  position: absolute;         
+  top: 880px;
+  left: 700px;
+  background-color:#fff; 
+  border: 1px solid black;
+}
+.bottomleft, .bottomleft-cc {
+    
+}
+.bottomleft-inner,.bottomleft-cc-inner {            
+  margin-right:5px;
+  margin-top:5px;
+  width:151px;  
+  height:153px;
+}
+
+.bottomleft-inner .mini-map, .bottomleft-cc-inner .mini-map {
+  border-top:1px solid black;
+  border-right:1px solid black;
+}
+
+.bottomleft-inner .minimap-title, .bottomleft-cc-inner .minimap-title{
+  border-bottom:1px solid black;
+}
+
+/*
+.malta {
+  width:151px;
+
+}
+*/
+
+
+
+
+/**
+ * LEGEND
+ */
+
+.legend-container {
+  width:691px;
+  background-color:#fff;
+  font-weight:bold;
+  border: 0;
+  margin-bottom:250px;
+  padding:0 15px;
+  color: #000;
+}
+
+
+
+.legend-cols {           
+  display:inline-block;
+  width:320px;
+  padding:5px;
+}
+
+.container-legend {
+    display: flex;
+    align-items: center;
+    justify-content: left;
+    height: 45px;
+}
+
+.legend-container h3 {
+    font-weight: bold;
+    font-size:16px;
+    margin:3px;
+}
+
+.legend-title, .legend-item-label{
+  font-weight: bold;
+  color: #000;
+  font-size:15px;
+  display: inline-block;
+  max-width:280px;
+}
+.legend-item{
+    display:block;
+}
+.color-legend, .legend-item-color {
+  width:25px;
+  height: 23px;
+  border:1px solid black;
+  display: inline-block;
+  margin-right:5px; 
+}
+
+.normalarea {
+  background-color:#EFEDA6;
+}
+.csa  {
+  background-color:#A4D596;
+}
+.art5854 {
+  background-color:#AE87CD;
+}
+.art58523 {
+  background-color:#6D8EE1;
+}
+.sa {  
+  background-image: url("../images/icon-sa.png");
+  border:none;
+}
+.no-eu {
+  background-color:#DCDBDC;
+}
+ 
+
+.legend-label {
+  font-size:12px; 
+}
+.legend-col-label{
+  padding-left:5px;
+}
+.legend-col {
+  width: 233px;
+}

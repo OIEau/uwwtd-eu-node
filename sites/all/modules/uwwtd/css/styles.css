@@ -1,0 +1,46 @@
+#uwwtd-conformity-form .form-item{
+	display: inline-block;
+	width: 10%;
+}
+
+#uwwtd-conformity-form .form-item:nth-child(5n+2){
+	width: 45%;
+}
+
+#uwwtd-conformity-form .form-item:nth-child(5n+5){
+	width: 30%;
+}
+
+#uwwtd-conformity-form .form-item:first-child{
+	width: 100%;
+}
+
+.stackedcolumnchart {
+    margin-top: 20px;
+}
+
+.charts-rows-cell th {
+    min-width: 70px;
+    text-align: right;
+}
+
+.charts-rows-cell th:first-child {
+    text-align: left;
+}
+
+.charts-rows-cell td {
+    text-align: right;
+}
+
+.charts-rows-cell td:first-child {
+    text-align: left;
+}
+
+.content-table, .content-table th {
+    text-align: center;
+}
+
+.content-table, .content-table td {
+    text-align: center;
+}
+

@@ -1,0 +1,85 @@
+<?php 
+
+function uwwtd_sync_menu(){
+	$items = array();
+    
+    $items['uwwtd-sync-debug'] = array(
+		'title' => t('Debug'),
+		'description' => t('debug'),
+		'page callback' => 'uwwtd_sync_debug',
+		//'page arguments' => array('uwwtd_data_form'),
+		'access callback' => TRUE,
+		//'access arguments' => array('Data-management access'),
+		'file' => 'uwwtd_sync.inc',
+		'file path' => drupal_get_path('module', 'uwwtd_sync') . '/inc/',
+		);
+    $items['admin/config/uwwtd/harvest'] = array(
+        'title' => 'UWWTD Harvest',
+        'description' => 'Start harvesting of each MS data by WFS call',
+        'page callback' => 'drupal_get_form',
+        'page arguments' => array('uwwtd_sync_harvest_form'),
+        'access callback' => 'user_access',
+        'access arguments' => array('uwwtd harvest'),
+        'type' => MENU_NORMAL_ITEM,
+        'file' => 'uwwtd_sync.inc',
+        'file path' => drupal_get_path('module', 'uwwtd_sync') . '/inc/',
+  	);
+    return $items;
+}
+
+
+// permission to view data pages
+function uwwtd_sync_permission() {
+  return array(
+    'uwwtd harvest' => array(
+      'title' => t('Allow MS data harvesting'),
+    )
+  );
+}
+
+/*
+--> strange some agg have "NULL" state
+
+-- Count compliance states  
+SELECT globalcompliance, count(*)
+FROM harvest.eu_9th_agglomeration_all
+WHERE aggstate = '1'
+GROUP BY globalcompliance
+ORDER BY globalcompliance;
+
+-- Count compliance states per country
+
+SELECT cc, globalcompliance, count(*)
+FROM harvest.eu_9th_agglomeration_all
+WHERE aggstate = '1'
+GROUP BY cc, globalcompliance
+ORDER BY cc, globalcompliance;
+
+-- Same with the following field but it need preprocess in order to find the right info if the field is empty
+-- rbdcode
+-- nust1code
+-- nust2code
+-- nust3code
+
+
+SELECT globalcompliance, count(*)
+FROM harvest.eu_9th_agglomeration_all
+WHERE aggstate = '1'
+GROUP BY globalcompliance
+ORDER BY globalcompliance;
+
+--- GESTION DES CARTES EU
+
+UPDATE data.nuts_0 SET cc = lower(nuts_id);
+UPDATE data.nuts_0 SET cc = 'gr' where cc='el';
+
+UPDATE data.nuts_2 SET cc = lower(substr(nuts_id, 1, 2));
+
+
+SELECT 	n.gid, n.nuts_id, n.cc, s.generatedload, s.connectedload, s.compliance_target	compliance_compliant, s.art3_target, s.art3_compliant, s.art4_target, s.art4_compliant, s.art5_target, s.art5_compliant, s.art6_target, s.art6_compliant, n.stat_levl_	shape_area, n.shape_len,n.geom
+FROM data.NUTS_0 n 
+    LEFT JOIN calcul.cc_stat_art_10th s ON  s.cc=n.cc
+WHERE n.nuts_id IN ('IT','AT','BE','BG','CY','CZ','DE','DK','EE','ES','FI','FR','EL','IE','LU','HR','HU','LT','LV','MT','NL','PL','PT','RO','SK','SI','SE','UK')
+ORDER BY n.shape_area;
+
+*/

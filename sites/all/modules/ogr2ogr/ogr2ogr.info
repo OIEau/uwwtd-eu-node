@@ -1,0 +1,12 @@
+name = Ogr2ogr
+description = Makes calls to the ogr2ogr geospatial command line tool.
+package = Geo Spatial Tools
+core = 7.x
+
+
+; Information added by drupal.org packaging script on 2013-10-01
+version = "7.x-1.x-dev"
+core = "7.x"
+project = "ogr2ogr"
+datestamp = "1380595309"
+

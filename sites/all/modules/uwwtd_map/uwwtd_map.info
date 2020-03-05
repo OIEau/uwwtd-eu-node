@@ -1,0 +1,6 @@
+name = UWWTD Maps & print map
+description = UWWTD Add a page with european maps
+core = 7.x
+version = 7.x-1.0
+project = uwwtd
+package = uwwtd

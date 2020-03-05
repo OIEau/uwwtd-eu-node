@@ -1,0 +1,54 @@
+<?php
+
+/**
+ * @file
+ * TODO: Rework module description
+ */
+
+/**
+* Implementation of hook_requirements().
+*/
+function ogr2ogr_requirements($phase) {
+  $requirements = array();
+  $t = get_t();
+
+  // Check that the ogr2ogr command can be found.
+  if ($ogr2ogr_path = exec('which ogr2ogr')) {
+    // TODO: Really should check that GDAL version >= 1.8
+    // TODO: Also should create an admin settings form so user can set ogr2ogr path to something custom
+    $requirements['ogr2ogr'] = array(
+      'title' => $t('ogr2ogr commmand found'),
+      'value' => $t('ogr2ogr library installed at %path', array('%path' => $ogr2ogr_path)),
+      'severity' => REQUIREMENT_OK,
+    );
+  }
+  else {
+    // $requirements['ogr2ogr'] = array(
+    //   'title' => $t('ogr2ogr not found in path'),
+    //   'value' => $t('ogr2ogr library was not found. This will prevent modules from making calls to ogr2ogr.'),
+    //   'severity' => REQUIREMENT_ERROR,
+    // );
+  }
+
+  return $requirements;
+}
+
+/**
+* Open a stream to a spatial file from ogr2ogr
+*/
+function ogr2ogr_open($uri) {
+  module_load_include('inc', 'ogr2ogr', 'ogr2ogr.class');
+  if ($ogr2ogr = new Ogr2ogr($uri)) {
+    return $ogr2ogr;
+  }
+}
+
+/**
+* Open a stream to a spatial file from ogr2ogr
+*/
+function ogr2ogr_open_ogrinfo($uri) {
+  module_load_include('inc', 'ogr2ogr', 'ogrinfo.class');
+  if ($ogrinfo = new OgrInfo($uri)) {
+    return $ogrinfo;
+  }
+}

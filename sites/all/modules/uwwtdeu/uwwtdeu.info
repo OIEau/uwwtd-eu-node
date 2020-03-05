@@ -1,0 +1,12 @@
+name = UWWTD EU
+description = This module provides all functionalities for the UWWTD EU SIIF platform.
+core = 7.x
+version = 7.x-0.6
+package = uwwtd
+stylesheets[all][] = css/styles.css
+dependencies[] = d3
+dependencies[] = field
+dependencies[] = list
+dependencies[] = number
+dependencies[] = options
+dependencies[] = text

@@ -1,0 +1,77 @@
+#uwwtd-conformity-form .form-item{
+    display: inline-block;
+    width: 10%;
+}
+
+#uwwtd-conformity-form .form-item:nth-child(5n+2){
+    width: 45%;
+}
+
+#uwwtd-conformity-form .form-item:nth-child(5n+5){
+    width: 30%;
+}
+
+#uwwtd-conformity-form .form-item:first-child{
+    width: 100%;
+}
+
+.stackedcolumnchart {
+    margin-top: 20px;
+}
+
+.charts-rows-cell th {
+    min-width: 70px;
+    text-align: right;
+}
+
+.charts-rows-cell th:first-child {
+    text-align: left;
+}
+
+.charts-rows-cell td {
+    text-align: right;
+}
+
+.charts-rows-cell td:first-child {
+    text-align: left;
+}
+
+.content-table, .content-table th {
+    text-align: center;
+}
+
+.content-table, .content-table td {
+    text-align: center;
+}
+
+
+/* CUSTOM CSS FOR UWWTD EU */
+.charts-rows-cell.full-width {
+    width: 100%;
+}
+
+.charts-rows-cell.full-width .flip-content {
+    overflow: auto;
+}
+
+.charts-rows-cell.full-width .cell-content {
+    max-width: 1084px;
+    width: 1084px;
+}
+
+.charts-rows-cell.full-width thead tr th:first-child {
+    display: block;
+    width: 200px;
+}
+
+.charts-rows-cell.full-width svg {
+    padding-top: 32px;
+}
+
+.container div.charts-row div.container {
+    height: 440px;
+}
+
+.view h1 {
+    display: none;
+}
