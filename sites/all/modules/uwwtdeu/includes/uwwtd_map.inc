@@ -92,7 +92,7 @@ $GLOBALS['uwwtd_map']['legend']=[
             'title'=>'',
             'items'=>[
                 ['label'=>'No data', 'color'=>'#ffffff'],
-                ['label'=>'Compliance assesment on whole territory only', 'color'=>'#4b4b4b'],
+                ['label'=>'Compliance assessment on whole territory only', 'color'=>'#4b4b4b'],
                 ['label'=>'Not Subject to compliance due to ongoing transitional period', 'color'=>'#808080'],
                 ['label'=>'Non EU countries', 'color'=>'#ececec'],
             ]
@@ -133,7 +133,7 @@ $GLOBALS['uwwtd_map']['legend']=[
             'title'=>'',
             'items'=>[
                 ['label'=>'No data', 'color'=>'#ffffff'],
-                ['label'=>'Compliance assesment on whole territory only', 'color'=>'#4b4b4b'],
+                ['label'=>'Compliance assessment on whole territory only', 'color'=>'#4b4b4b'],
                 ['label'=>'Not Subject to compliance due to ongoing transitional period', 'color'=>'#808080'],
                 ['label'=>'Non EU countries', 'color'=>'#ececec'],
             ]
@@ -173,9 +173,11 @@ $GLOBALS['uwwtd_map']['legend']=[
             'title'=>'',
             'items'=>[
                 ['label'=>'No data', 'color'=>'#ffffff'],
-                ['label'=>'Compliance assesment on whole territory only', 'color'=>'#4b4b4b'],
+                //['label'=>'Compliance assessment on whole territory only*', 'color'=>'#4b4b4b'],
                 ['label'=>'Not Subject to compliance due to ongoing transitional period', 'color'=>'#808080'],
                 ['label'=>'Non EU countries', 'color'=>'#ececec'],
+                ['label'=>'Exceptionally for Romania distance to target is shown at country level'], //no color because we just want a text
+                
             ]
         ]
     ],
@@ -194,7 +196,7 @@ $GLOBALS['uwwtd_map']['legend']=[
             'title'=>'',
             'items'=>[
                 ['label'=>'No data', 'color'=>'#ffffff'],
-                ['label'=>'Compliance assesment on whole territory only', 'color'=>'#4b4b4b'],
+                ['label'=>'Compliance assessment on whole territory only', 'color'=>'#4b4b4b'],
                 ['label'=>'Not Subject to compliance due to ongoing transitional period', 'color'=>'#808080'],
                 ['label'=>'Non EU countries', 'color'=>'#ececec'],
             ]
@@ -221,7 +223,6 @@ $GLOBALS['uwwtd_map']['europe'] = array(
         'map_name' => 'madeira',
         'class'    => 'madeira',
       ),
-  
       //Islas Canriass  ES
       'Islas Canarias (ES)' => array(
         'title' => 'Islas Canarias (ES)',

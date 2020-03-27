@@ -294,14 +294,26 @@ function uwwtd_map_view_map($wms_layer_name){
             $data = uwwtd_map_get_mslevel_data($report='10th');
             if(!empty($data)){
                 foreach($data as $cc=>$item){
-                    $table[] = [
-                        'Country'=>strtoupper($item['cc']),
-                        'Total generated load'=>uwwtdeu_format_number($item['generatedload']),
-                        //'Connected load'=>uwwtdeu_format_number($item['connectedload']),
-                        'Targeted load'=>uwwtdeu_format_number($item[$key_target]),
-                        'Compliant load'=>uwwtdeu_format_number($item[$key_value]),
-                        'Rate'=>uwwtdeu_format_pcnumber($item[$key_rate]),
-                    ];
+                    if($info[2] == 'dtt'){
+                        $table[] = [
+                            'Country'=>strtoupper($item['cc']),
+                            'Total generated load'=>uwwtdeu_format_number($item['generatedload']),
+                            //'Connected load'=>uwwtdeu_format_number($item['connectedload']),
+                            'Targeted load'=>uwwtdeu_format_number($item[$key_target]),
+                            'Distance'=>uwwtdeu_format_number($item[$key_value]),
+                            'Rate'=>uwwtdeu_format_pcnumber($item[$key_rate]),
+                        ];
+                    }
+                    else{
+                        $table[] = [
+                            'Country'=>strtoupper($item['cc']),
+                            'Total generated load'=>uwwtdeu_format_number($item['generatedload']),
+                            //'Connected load'=>uwwtdeu_format_number($item['connectedload']),
+                            'Targeted load'=>uwwtdeu_format_number($item[$key_target]),
+                            'Compliant load'=>uwwtdeu_format_number($item[$key_value]),
+                            'Rate'=>uwwtdeu_format_pcnumber($item[$key_rate]),
+                        ];
+                    }
                 }
             }
         }
@@ -309,15 +321,28 @@ function uwwtd_map_view_map($wms_layer_name){
             $data = uwwtd_map_get_nuts2level_data($report='10th');
             if(!empty($data)){
                 foreach($data as $cc=>$item){
-                    $table[] = [
-                        'Country'=>'<b>'.strtoupper($item['cc']).'</b>',
-                        'NUTS 2'=>'<b>'.strtoupper($item['nuts_id']).'</b> - '.$item['nuts_name'],
-                        'Total generated load'=>uwwtdeu_format_number($item['generatedload']),
-                        //'Connected load'=>uwwtdeu_format_number($item['connectedload']),
-                        'Targeted load'=>uwwtdeu_format_number($item[$key_target]),
-                        'Compliant load'=>uwwtdeu_format_number($item[$key_value]),
-                        'Rate'=>'<b>'.uwwtdeu_format_pcnumber($item[$key_rate]).'</b>',
-                    ];
+                    if($info[2] == 'dtt'){
+                        $table[] = [
+                            'Country'=>'<b>'.strtoupper($item['cc']).'</b>',
+                            'NUTS 2'=>'<b>'.strtoupper($item['nuts_id']).'</b> - '.$item['nuts_name'],
+                            'Total generated load'=>uwwtdeu_format_number($item['generatedload']),
+                            //'Connected load'=>uwwtdeu_format_number($item['connectedload']),
+                            'Targeted load'=>uwwtdeu_format_number($item[$key_target]),
+                            'Distance'=>uwwtdeu_format_number($item[$key_value]),
+                            'Rate'=>'<b>'.uwwtdeu_format_pcnumber($item[$key_rate]).'</b>',
+                        ];
+                    }else{
+                        $table[] = [
+                            'Country'=>'<b>'.strtoupper($item['cc']).'</b>',
+                            'NUTS 2'=>'<b>'.strtoupper($item['nuts_id']).'</b> - '.$item['nuts_name'],
+                            'Total generated load'=>uwwtdeu_format_number($item['generatedload']),
+                            //'Connected load'=>uwwtdeu_format_number($item['connectedload']),
+                            'Targeted load'=>uwwtdeu_format_number($item[$key_target]),
+                            'Compliant load'=>uwwtdeu_format_number($item[$key_value]),
+                            'Rate'=>'<b>'.uwwtdeu_format_pcnumber($item[$key_rate]).'</b>',
+                        ];
+                    }
+                    
                 }
             }
         }
@@ -325,15 +350,28 @@ function uwwtd_map_view_map($wms_layer_name){
             $data = uwwtd_map_get_rbdlevel_data($report='10th');
             if(!empty($data)){
                 foreach($data as $cc=>$item){
-                    $table[] = [
-                        'Country'=>'<b>'.strtoupper($item['cc']).'</b>',
-                        'RBD'=>'<b>'.strtoupper($item['rbd']) .'</b> - '. $item['nametxtint'],
-                        'Total generated load'=>uwwtdeu_format_number($item['generatedload']),
-                        //'Connected load'=>uwwtdeu_format_number($item['connectedload']),
-                        'Targeted load'=>uwwtdeu_format_number($item[$key_target]),
-                        'Compliant load'=>uwwtdeu_format_number($item[$key_value]),
-                        'Rate'=>'<b>'.uwwtdeu_format_pcnumber($item[$key_rate]).'</b>',
-                    ];
+                    if($info[2] == 'dtt'){
+                        $table[] = [
+                            'Country'=>'<b>'.strtoupper($item['cc']).'</b>',
+                            'RBD'=>'<b>'.strtoupper($item['rbd']) .'</b> - '. $item['nametxtint'],
+                            'Total generated load'=>uwwtdeu_format_number($item['generatedload']),
+                            //'Connected load'=>uwwtdeu_format_number($item['connectedload']),
+                            'Targeted load'=>uwwtdeu_format_number($item[$key_target]),
+                            'Distance'=>uwwtdeu_format_number($item[$key_value]),
+                            'Rate'=>'<b>'.uwwtdeu_format_pcnumber($item[$key_rate]).'</b>',
+                        ];
+                    }
+                    else{
+                        $table[] = [
+                            'Country'=>'<b>'.strtoupper($item['cc']).'</b>',
+                            'RBD'=>'<b>'.strtoupper($item['rbd']) .'</b> - '. $item['nametxtint'],
+                            'Total generated load'=>uwwtdeu_format_number($item['generatedload']),
+                            //'Connected load'=>uwwtdeu_format_number($item['connectedload']),
+                            'Targeted load'=>uwwtdeu_format_number($item[$key_target]),
+                            'Compliant load'=>uwwtdeu_format_number($item[$key_value]),
+                            'Rate'=>'<b>'.uwwtdeu_format_pcnumber($item[$key_rate]).'</b>',
+                        ];
+                    }
                 }
             }
         }
@@ -428,7 +466,12 @@ function uwwtd_map_getLegend($map_type){
             $col_str ='';
             if($col['title']!=''){$col_str.='<h3>'.$col['title'].'</h3>';}
             foreach($col['items'] as $item){
-                $col_str.='<div class="legend-item"><div class="legend-item-color" style="background-color:'.$item['color'].';"></div><div class="legend-item-label">'.$item['label'].'</div></div>';
+                if(isset($item['color'])){
+                        $col_str.='<div class="legend-item"><div class="legend-item-color" style="background-color:'.$item['color'].';"></div><div class="legend-item-label">'.$item['label'].'</div></div>';
+                    }
+                else{
+                    $col_str.='<div class="legend-item"><i>'.$item['label'].'</i></div>';
+                }
             }
             $output.= '<div class="legend-cols">'.$col_str.'</div>';
         }
@@ -615,9 +658,9 @@ function uwwtd_map_get_nuts2level_data($report='10th'){
             r.art4_target,r.art4_compliant, CASE WHEN cc='HR' THEN -2  WHEN cc='RO' THEN -3 WHEN art4_target > 0 THEN round((art4_compliant/art4_target)*100, 1) ELSE -1 END AS art4_rate,
             r.art5_target,r.art5_compliant, CASE WHEN cc='HR' THEN -2  WHEN cc='RO' THEN -3 WHEN art5_target > 0 THEN round((art5_compliant/art5_target)*100, 1) ELSE -1 END AS art5_rate,
             r.art6_target,r.art6_compliant, CASE WHEN cc='HR' THEN -2  WHEN cc='RO' THEN -3 WHEN art6_target > 0 THEN round((art6_compliant/art6_target)*100, 1) ELSE -1 END AS art6_rate,
-            r.dtt3_pd,r.dtt3_exp, CASE WHEN cc='HR' THEN -2  WHEN cc='RO' THEN -3 WHEN art3_target > 0 THEN round((r.dtt3_exp/r.art3_target)*100, 1) ELSE -1 END AS dtt3_exp_rate,
-            r.dtt4t_pd,r.dtt4t_exp,r.dtt4p_pd,r.dtt4p_exp, CASE WHEN cc='HR' THEN -2  WHEN cc='RO' THEN -3 WHEN art4_target > 0 THEN round((r.dtt4t_exp/r.art4_target)*100,1) ELSE -1 END AS dtt4t_exp_rate, CASE WHEN cc='HR' THEN -2  WHEN cc='RO' THEN -3 WHEN art4_target > 0 THEN round((r.dtt4p_exp/r.art4_target)*100,1) ELSE -1 END AS dtt4p_exp_rate,
-            r.dtt5t_pd,r.dtt5t_exp,r.dtt5p_pd,r.dtt5p_exp, CASE WHEN cc='HR' THEN -2  WHEN cc='RO' THEN -3 WHEN art5_target > 0 THEN round((r.dtt5t_exp/r.art5_target)*100,1) ELSE -1 END AS dtt5t_exp_rate, CASE WHEN cc='HR' THEN -2  WHEN cc='RO' THEN -3 WHEN art5_target > 0 THEN round((r.dtt5p_exp/r.art5_target)*100,1) ELSE -1 END AS dtt5p_exp_rate
+            r.dtt3_pd,r.dtt3_exp, CASE WHEN cc='HR' THEN -2  WHEN cc='RO' THEN 26 WHEN art3_target > 0 THEN round((r.dtt3_exp/r.art3_target)*100, 1) ELSE -1 END AS dtt3_exp_rate,
+            r.dtt4t_pd,r.dtt4t_exp,r.dtt4p_pd,r.dtt4p_exp, CASE WHEN cc='HR' THEN -2  WHEN cc='RO' THEN 50 WHEN art4_target > 0 THEN round((r.dtt4t_exp/r.art4_target)*100,1) ELSE -1 END AS dtt4t_exp_rate, CASE WHEN cc='HR' THEN -2  WHEN cc='RO' THEN 50 WHEN art4_target > 0 THEN round((r.dtt4p_exp/r.art4_target)*100,1) ELSE -1 END AS dtt4p_exp_rate,
+            r.dtt5t_pd,r.dtt5t_exp,r.dtt5p_pd,r.dtt5p_exp, CASE WHEN cc='HR' THEN -2  WHEN cc='RO' THEN 65 WHEN art5_target > 0 THEN round((r.dtt5t_exp/r.art5_target)*100,1) ELSE -1 END AS dtt5t_exp_rate, CASE WHEN cc='HR' THEN -2  WHEN cc='RO' THEN 65 WHEN art5_target > 0 THEN round((r.dtt5p_exp/r.art5_target)*100,1) ELSE -1 END AS dtt5p_exp_rate
         FROM data.nuts_2_v2016 geo
             LEFT JOIN calcul.nuts2_stat_art_10th r  ON r.nuts2=geo.nuts_id
         WHERE geo.cc IN ('IT','AT','BE','BG','CY','CZ','DE','DK','EE','ES','FI','FR','EL','IE','LU','HR','HU','LT','LV','MT','NL','PL','PT','RO','SK','SI','SE','UK')
