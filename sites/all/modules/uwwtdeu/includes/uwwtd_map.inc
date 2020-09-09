@@ -8,13 +8,13 @@ $GLOBALS['uwwtd_map']['maps']=[
     'mslevel_art4_comp_10th'=>['title'=>"Degree of compliance with Article 4 at MS level for 10th report (2016)", 'map_scale'=>'MS Level', 'map_type'=>'Compliance at MS level', 'access'=>true],
     'mslevel_art5_comp_10th'=>['title'=>"Degree of compliance with Article 5 at MS level for 10th report (2016)", 'map_scale'=>'MS Level', 'map_type'=>'Compliance at MS level', 'access'=>true],
     //==NUTS 2
-    'nuts2level_global_comp_10th_by_cc'=>['title'=>"Degree of compliance at Nuts 2 level for 10th report (2016) by country", 'map_scale'=>'Nuts 2', 'map_type'=>'Compliance at Nuts 2 level', 'access'=>false],
-    'nuts2level_global_comp_10th_by_cc_mono'=>['title'=>"Compliance rate at Nuts 2 level for 10th report (2016) by country", 'map_scale'=>'Nuts 2', 'map_type'=>'Compliance at Nuts 2 level monochrome', 'access'=>false],
-    'nuts2level_global_comp_10th_mono'=>['title'=>"Compliance rate at Nuts 2 level for 10th report (2016)", 'map_scale'=>'Nuts 2', 'map_type'=>'Compliance at Nuts 2 level monochrome', 'access'=>false],
-    'nuts2level_global_comp_10th'=>['title'=>"Degree of compliance at Nuts 2 level for 10th report (2016)", 'map_scale'=>'Nuts 2', 'map_type'=>'Compliance at Nuts 2 level', 'access'=>true],
-    'nuts2level_art3_comp_10th'=>['title'=>"Degree of compliance with Article 3 at Nuts 2 level for 10th report (2016)", 'map_scale'=>'Nuts 2', 'map_type'=>'Compliance at Nuts 2 level', 'access'=>true],
-    'nuts2level_art4_comp_10th'=>['title'=>"Degree of compliance with Article 4 at Nuts 2 level for 10th report (2016)", 'map_scale'=>'Nuts 2', 'map_type'=>'Compliance at Nuts 2 level', 'access'=>true],
-    'nuts2level_art5_comp_10th'=>['title'=>"Degree of compliance with Article 5 at Nuts 2 level for 10th report (2016)", 'map_scale'=>'Nuts 2', 'map_type'=>'Compliance at Nuts 2 level', 'access'=>true],
+    'nuts2level_global_comp_10th_by_cc'=>['title'=>"Degree of compliance at NUTS 2 level for 10th report (2016) by country", 'map_scale'=>'NUTS 2', 'map_type'=>'Compliance at NUTS 2 level', 'access'=>false],
+    'nuts2level_global_comp_10th_by_cc_mono'=>['title'=>"Compliance rate at NUTS 2 level for 10th report (2016) by country", 'map_scale'=>'NUTS 2', 'map_type'=>'Compliance at NUTS 2 level monochrome', 'access'=>false],
+    'nuts2level_global_comp_10th_mono'=>['title'=>"Compliance rate at NUTS 2 level for 10th report (2016)", 'map_scale'=>'NUTS 2', 'map_type'=>'Compliance at NUTS 2 level monochrome', 'access'=>false],
+    'nuts2level_global_comp_10th'=>['title'=>"Degree of compliance at NUTS 2 level for 10th report (2016)", 'map_scale'=>'NUTS 2', 'map_type'=>'Compliance at NUTS 2 level', 'access'=>true],
+    'nuts2level_art3_comp_10th'=>['title'=>"Degree of compliance with Article 3 at NUTS 2 level for 10th report (2016)", 'map_scale'=>'NUTS 2', 'map_type'=>'Compliance at NUTS 2 level', 'access'=>true],
+    'nuts2level_art4_comp_10th'=>['title'=>"Degree of compliance with Article 4 at NUTS 2 level for 10th report (2016)", 'map_scale'=>'NUTS 2', 'map_type'=>'Compliance at NUTS 2 level', 'access'=>true],
+    'nuts2level_art5_comp_10th'=>['title'=>"Degree of compliance with Article 5 at NUTS 2 level for 10th report (2016)", 'map_scale'=>'NUTS 2', 'map_type'=>'Compliance at NUTS 2 level', 'access'=>true],
     //== RBD
     'rbdlevel_global_comp_10th'=>['title'=>"Degree of compliance at RBD level for 10th report (2016)", 'map_scale'=>'RBD', 'map_type'=>'Compliance at RBD level', 'access'=>true],
     'rbdlevel_art3_comp_10th'=>['title'=>"Degree of compliance with Article 3 at RBD level for 10th report (2016)", 'map_scale'=>'RBD', 'map_type'=>'Compliance at RBD level', 'access'=>true],
@@ -27,9 +27,9 @@ $GLOBALS['uwwtd_map']['maps']=[
     'mslevel_art4_dtt_10th'=>['title'=>"Degree of distance to target with Article 4 at MS level for 10th report (2016)", 'map_scale'=>'MS Level', 'map_type'=>'Distance to target at MS level', 'access'=>true],
     'mslevel_art5_dtt_10th'=>['title'=>"Degree of distance to target with Article 5 at MS level for 10th report (2016)", 'map_scale'=>'MS Level', 'map_type'=>'Distance to target at MS level', 'access'=>true],
     //==NUTS 2
-    'nuts2level_art3_dtt_10th'=>['title'=>"Degree of distance to target with Article 3 at Nuts 2 level for 10th report (2016)", 'map_scale'=>'Nuts 2', 'map_type'=>'Distance to target at Nuts 2 level', 'access'=>true],
-    'nuts2level_art4_dtt_10th'=>['title'=>"Degree of distance to target with Article 4 at Nuts 2 level for 10th report (2016)", 'map_scale'=>'Nuts 2', 'map_type'=>'Distance to target at Nuts 2 level', 'access'=>true],
-    'nuts2level_art5_dtt_10th'=>['title'=>"Degree of distance to target with Article 5 at Nuts 2 level for 10th report (2016)", 'map_scale'=>'Nuts 2', 'map_type'=>'Distance to target at Nuts 2 level', 'access'=>true],
+    'nuts2level_art3_dtt_10th'=>['title'=>"Degree of distance to target with Article 3 at NUTS 2 level for 10th report (2016)", 'map_scale'=>'NUTS 2', 'map_type'=>'Distance to target at NUTS 2 level', 'access'=>true],
+    'nuts2level_art4_dtt_10th'=>['title'=>"Degree of distance to target with Article 4 at NUTS 2 level for 10th report (2016)", 'map_scale'=>'NUTS 2', 'map_type'=>'Distance to target at NUTS 2 level', 'access'=>true],
+    'nuts2level_art5_dtt_10th'=>['title'=>"Degree of distance to target with Article 5 at NUTS 2 level for 10th report (2016)", 'map_scale'=>'NUTS 2', 'map_type'=>'Distance to target at NUTS 2 level', 'access'=>true],
     //== RBD
     'rbdlevel_art3_dtt_10th'=>['title'=>"Degree of distance to target with Article 3 at RBD level for 10th report (2016)", 'map_scale'=>'RBD', 'map_type'=>'Distance to target at RBD level', 'access'=>true],
     'rbdlevel_art4_dtt_10th'=>['title'=>"Degree of distance to target with Article 4 at RBD level for 10th report (2016)", 'map_scale'=>'RBD', 'map_type'=>'Distance to target at RBD level', 'access'=>true],
@@ -43,18 +43,18 @@ $GLOBALS['uwwtd_map']['legend']=[
         [
             'title'=>'',
             'items'=>[
-                ['label'=>'Sensitive areas (MS applies Art 5(2-3))', 'color'=>'#4b8400'],
-                ['label'=>'Catchment of sensitive areas (MS applies Art 5(2-3))', 'color'=>'#a4d596'],
-                ['label'=>'Sensitive area (MS applies Art 5(2-3) and Art 5(8))', 'color'=>' #969664'],
+                ['label'=>'Sensitive areas (MS applies Art. 5(2-3))', 'color'=>'#4b8400'],
+                ['label'=>'Catchment of sensitive areas (MS applies Art. 5(2-3))', 'color'=>'#a4d596'],
+                ['label'=>'Sensitive area (MS applies Art. 5(2-3) and Art. 5(8))', 'color'=>' #969664'],
             ]
         ],
         [
             'title'=>'',
             'items'=>[
-                ['label'=>'Sensitive area (MS applies Art 5(4) and Art 5(8))', 'color'=>'#3f348e'],
-                ['label'=>'Sensitive area (MS applies Art 5(4))', 'color'=>'#654aa9'],
+                ['label'=>'Sensitive area (MS applies Art. 5(4) and Art. 5(8))', 'color'=>'#3f348e'],
+                ['label'=>'Sensitive area (MS applies Art. 5(4))', 'color'=>'#654aa9'],
                 ['label'=>'Normal areas', 'color'=>'#faf8cc'], //#ddf7b4
-                ['label'=>'Non EU countries', 'color'=>'#ececec'],
+                ['label'=>'Non-EU countries', 'color'=>'#ececec'],
             ]
         ]
     ],
@@ -72,12 +72,12 @@ $GLOBALS['uwwtd_map']['legend']=[
         [
             'title'=>'',
             'items'=>[
-                ['label'=>'Not Subject to compliance due to ongoing transitional period', 'color'=>'#808080'],
-                ['label'=>'Non EU countries', 'color'=>'#ececec'],
+                ['label'=>'Not subject to compliance due to ongoing transitional period', 'color'=>'#808080'],
+                ['label'=>'Non-EU countries', 'color'=>'#ececec'],
             ]
         ]
     ],
-    'Compliance at Nuts 2 level'=>[
+    'Compliance at NUTS 2 level'=>[
         [
             'title'=>'Degree of compliance',
             'items'=>[
@@ -92,13 +92,14 @@ $GLOBALS['uwwtd_map']['legend']=[
             'title'=>'',
             'items'=>[
                 ['label'=>'No data', 'color'=>'#ffffff'],
-                ['label'=>'Compliance assessment on whole territory only', 'color'=>'#4b4b4b'],
-                ['label'=>'Not Subject to compliance due to ongoing transitional period', 'color'=>'#808080'],
-                ['label'=>'Non EU countries', 'color'=>'#ececec'],
+                //['label'=>'Compliance assessment on whole territory only', 'color'=>'#4b4b4b'],
+                ['label'=>'Not subject to compliance due to ongoing transitional period', 'color'=>'#808080'],
+                ['label'=>'Non-EU countries', 'color'=>'#ececec'],
+                ['label'=>'Note: A degree of compliance is shown for Romania at country level.'],
             ]
         ]
     ],
-    'Compliance at Nuts 2 level monochrome'=>[
+    'Compliance at NUTS 2 level monochrome'=>[
         [
             'title'=>'Degree of compliance',
             'items'=>[
@@ -113,8 +114,8 @@ $GLOBALS['uwwtd_map']['legend']=[
             'title'=>'',
             'items'=>[
                 ['label'=>'No data', 'color'=>'#ffffff'],
-                ['label'=>'Not Subject to compliance due to ongoing transitional period', 'color'=>'#808080'],
-                ['label'=>'Non EU countries', 'color'=>'#ececec'],
+                ['label'=>'Not subject to compliance due to ongoing transitional period', 'color'=>'#808080'],
+                ['label'=>'Non-EU countries', 'color'=>'#ececec'],
             ]
         ]
     ],
@@ -134,8 +135,8 @@ $GLOBALS['uwwtd_map']['legend']=[
             'items'=>[
                 ['label'=>'No data', 'color'=>'#ffffff'],
                 ['label'=>'Compliance assessment on whole territory only', 'color'=>'#4b4b4b'],
-                ['label'=>'Not Subject to compliance due to ongoing transitional period', 'color'=>'#808080'],
-                ['label'=>'Non EU countries', 'color'=>'#ececec'],
+                ['label'=>'Not subject to compliance due to ongoing transitional period', 'color'=>'#808080'],
+                ['label'=>'Non-EU countries', 'color'=>'#ececec'],
             ]
         ]
     ],
@@ -153,12 +154,12 @@ $GLOBALS['uwwtd_map']['legend']=[
         [
             'title'=>'',
             'items'=>[
-                ['label'=>'Not Subject to compliance due to ongoing transitional period', 'color'=>'#808080'],
-                ['label'=>'Non EU countries', 'color'=>'#ececec'],
+                ['label'=>'Not subject to compliance due to ongoing transitional period', 'color'=>'#808080'],
+                ['label'=>'Non-EU countries', 'color'=>'#ececec'],
             ]
         ]
     ],
-    'Distance to target at Nuts 2 level'=>[
+    'Distance to target at NUTS 2 level'=>[
         [
             'title'=>'Degree of distance to target',
             'items'=>[
@@ -174,9 +175,9 @@ $GLOBALS['uwwtd_map']['legend']=[
             'items'=>[
                 ['label'=>'No data', 'color'=>'#ffffff'],
                 //['label'=>'Compliance assessment on whole territory only*', 'color'=>'#4b4b4b'],
-                ['label'=>'Not Subject to compliance due to ongoing transitional period', 'color'=>'#808080'],
-                ['label'=>'Non EU countries', 'color'=>'#ececec'],
-                ['label'=>'Exceptionally for Romania distance to target is shown at country level'], //no color because we just want a text
+                ['label'=>'Not subject to compliance due to ongoing transitional period', 'color'=>'#808080'],
+                ['label'=>'Non-EU countries', 'color'=>'#ececec'],
+                ['label'=>'Note: A degree of compliance is shown for Romania at country level.'], //no color because we just want a text
                 
             ]
         ]
@@ -197,8 +198,8 @@ $GLOBALS['uwwtd_map']['legend']=[
             'items'=>[
                 ['label'=>'No data', 'color'=>'#ffffff'],
                 ['label'=>'Compliance assessment on whole territory only', 'color'=>'#4b4b4b'],
-                ['label'=>'Not Subject to compliance due to ongoing transitional period', 'color'=>'#808080'],
-                ['label'=>'Non EU countries', 'color'=>'#ececec'],
+                ['label'=>'Not subject to compliance due to ongoing transitional period', 'color'=>'#808080'],
+                ['label'=>'Non-EU countries', 'color'=>'#ececec'],
             ]
         ]
     ]
